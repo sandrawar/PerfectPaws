@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -43,6 +44,27 @@ class MyApp extends StatelessWidget {
 
 final GoRouter _router = GoRouter(
   initialLocation: '/login',
+  errorPageBuilder: (context, state) => MaterialPage(
+    child: Scaffold(
+      body: Center(
+        child: Text('Błąd: ${state.error}'),
+      ),
+    ),
+  ),
+  redirect: (context, state) {
+    final isLoggedIn = FirebaseAuth.instance.currentUser != null;
+    final isOnLoginPage = state.matchedLocation == '/login' || state.matchedLocation == '/register';
+
+    if (!isLoggedIn && !isOnLoginPage) {
+      return '/login'; 
+    }
+
+    if (isLoggedIn && isOnLoginPage) {
+      return '/'; 
+    }
+
+    return null; 
+  },
   routes: [
     GoRoute(
       path: '/login',
@@ -60,16 +82,24 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const DogsListScreen(),
     ),
     GoRoute(
-        path: '/volunteer-dogs', 
-        builder: (context, state) => const VolunteerDogsListScreen(),
-      ),
-      GoRoute(
+      path: '/volunteer-dogs',
+      name: 'volunteerDogs',
+      builder: (context, state) => const VolunteerDogsListScreen(),
+    ),
+    GoRoute(
       path: '/dog-details/:id',
+      name: 'dogDetails',
       builder: (context, state) {
-        //final dogId = state.pathParameters['id']!;
-        final dogData = state.extra as Dog;
+        final dogData = state.extra as Dog?;
+        if (dogData == null) {
+          return Scaffold(
+            appBar: AppBar(title: const Text('Błąd')),
+            body: const Center(child: Text('Nie znaleziono szczegółów psa')),
+          );
+        }
         return DogDetailsScreen(dog: dogData);
       },
     ),
   ],
 );
+
