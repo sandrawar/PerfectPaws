@@ -1,13 +1,34 @@
+import 'package:hive/hive.dart';
+part 'dog_class.g.dart'; 
+
+@HiveType(typeId: 0)
 class Dog {
-  String id;
+  @HiveField(0)
+  final String id;
+
+  @HiveField(1)
   final String name;
+
+  @HiveField(2)
+  final String description;
+
+  @HiveField(3)
   final String imageUrl;
+
+  @HiveField(4)
+  final String location;
+
+  @HiveField(5)
   bool isSaved;
+
+  @HiveField(6)
   final int age;
+
+  @HiveField(7)
   int numberOfSaves;
+
+  @HiveField(8)
   final String volunteer;
-  final String description; 
-  final String location; 
 
   Dog({
     this.id = '',

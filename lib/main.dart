@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -5,7 +7,11 @@ import 'package:go_router/go_router.dart';
 import 'package:perfect_paws/dog_class.dart';
 import 'package:perfect_paws/dog_details_screen.dart';
 import 'package:perfect_paws/firebase_options.dart';
+import 'package:perfect_paws/networ_status.dart';
+import 'package:perfect_paws/sync_act.dart';
+import 'package:perfect_paws/sync_service.dart';
 import 'package:perfect_paws/volunteer_dog_list_screen.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'dogs_list_screen.dart'; 
 import 'login_screen.dart'; 
 import 'register_screen.dart'; 
@@ -21,7 +27,21 @@ Future<void> main() async {
   } catch (e) {
     print('Firebase initialization failed: $e');
   }
+  await Hive.initFlutter();
+   Hive.registerAdapter(DogAdapter());
+  Hive.registerAdapter(SyncActionAdapter());
 
+
+  var syncActionBox = await Hive.openBox<SyncAction>('syncActions');
+   
+   var syncService = SyncService(Hive.box<SyncAction>('syncActions'));
+
+  NetworkStatusService().connectivityStream.listen((result) async {
+    if (result != ConnectivityResult.none) {
+      await syncService.syncOfflineChanges();
+    }
+  });
+  
   runApp(const MyApp());
 }
 

@@ -2,13 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:perfect_paws/message_list_screen.dart';
+import 'package:perfect_paws/networ_status.dart';
+import 'package:perfect_paws/sync_act.dart';
+import 'package:perfect_paws/sync_service.dart';
 import 'add_dog_form.dart';
 import 'dog_class.dart';
 import 'dog_card.dart';
 import 'package:flutter/foundation.dart';
 import 'volunteer_dog_list_screen.dart';
+import 'networ_status.dart';
 
 class DogsListScreen extends StatefulWidget {
   const DogsListScreen({super.key});
@@ -21,8 +27,20 @@ class _DogsListScreenState extends State<DogsListScreen> {
   late User _currentUser;
   late CollectionReference _savedDogsCollection;
 
-  bool _showOnlySaved = false; 
+  bool _showOnlySaved = false;
   bool _isSortedBySaves = false;
+  Box<Dog>? _savedDogsBox;
+  Box<SyncAction>? _syncActionBox;
+
+  Future<void> _openBox() async {
+    _savedDogsBox = await Hive.openBox<Dog>('saved_dogs');
+  }
+
+  Future<void> _initializeSyncService() async {
+    _syncActionBox = await Hive.openBox<SyncAction>('sync_actions');
+    final syncService = SyncService(_syncActionBox!);
+    await syncService.syncOfflineChanges();
+  }
 
   @override
   void initState() {
@@ -32,90 +50,140 @@ class _DogsListScreenState extends State<DogsListScreen> {
         .collection('users')
         .doc(_currentUser.uid)
         .collection('saved_dogs');
+
+    _openBox();
+    _initializeSyncService();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dogs'),
-        actions: [
-          IconButton(
-            icon: Icon(_showOnlySaved ? Icons.list : Icons.star),
-            onPressed: () {
-              setState(() {
-                _showOnlySaved = !_showOnlySaved;
-              });
-            },
-          ),
-          IconButton(
-            icon: Icon(
-              _isSortedBySaves ? Icons.sort_by_alpha : Icons.sort,
-            ),
-            onPressed: () {
-              setState(() {
-                _isSortedBySaves = !_isSortedBySaves;
-              });
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.message), 
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const MessagesListScreen(),
-                ),
-              );
-            },
-          ),
-          FutureBuilder<bool>( 
-            future: _isUserVolunteer(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SizedBox.shrink(); 
-              }
-
-              if (snapshot.data == true) {
-                return IconButton(
-                  icon: const Icon(Icons.pets),
-                  onPressed: () {
-                    context.go('/volunteer-dogs'); 
-                  },
-                );
-              } else {
-                return const SizedBox.shrink(); 
-              }
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.exit_to_app),
-            onPressed: _logout,
-          ),
-        ],
+  appBar: AppBar(
+    title: const Text('Dogs'),
+    actions: [
+      IconButton(
+        icon: Icon(_showOnlySaved ? Icons.list : Icons.star),
+        onPressed: () {
+          setState(() {
+            _showOnlySaved = !_showOnlySaved;
+          });
+        },
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: _getDogQuery(),
+      IconButton(
+        icon: Icon(
+          _isSortedBySaves ? Icons.sort_by_alpha : Icons.sort,
+        ),
+        onPressed: () {
+          setState(() {
+            _isSortedBySaves = !_isSortedBySaves;
+          });
+        },
+      ),
+      IconButton(
+        icon: const Icon(Icons.message),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MessagesListScreen(),
+            ),
+          );
+        },
+      ),
+      FutureBuilder<bool>(
+        future: _isUserVolunteer(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const SizedBox.shrink();
           }
 
-          if (snapshot.hasError) {
-            return Center(child: Text('Błąd: ${snapshot.error}'));
+          if (snapshot.data == true) {
+            return IconButton(
+              icon: const Icon(Icons.pets),
+              onPressed: () {
+                context.go('/volunteer-dogs');
+              },
+            );
+          } else {
+            return const SizedBox.shrink();
           }
+        },
+      ),
+      IconButton(
+        icon: const Icon(Icons.exit_to_app),
+        onPressed: _logout,
+      ),
+    ],
+  ),
+  body: FutureBuilder<void>(
+    future: Future.wait([_openBox(), _initializeSyncService()]),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      }
 
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(
-              child: Text(
-                  _showOnlySaved ? 'Brak zapisanych psów.' : 'Brak psów w bazie.'),
+      if (snapshot.hasError) {
+        return Center(child: Text('Błąd inicjalizacji: ${snapshot.error}'));
+      }
+
+      return ValueListenableBuilder(
+        valueListenable: _savedDogsBox!.listenable(),
+        builder: (context, Box<Dog> box, _) {
+          final dogs = _showOnlySaved
+              ? box.values.toList() // When showing saved dogs, use HiveBox
+              : []; // Initially empty list for Firebase dogs
+
+          // If we're not showing only saved dogs, fetch them from Firebase
+          if (!_showOnlySaved) {
+            return FutureBuilder<List<Dog>>(
+              future: _getDogsFromFirebase(),
+              builder: (context, firebaseSnapshot) {
+                if (firebaseSnapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (firebaseSnapshot.hasError) {
+                  return Center(child: Text('Błąd pobierania psów: ${firebaseSnapshot.error}'));
+                }
+
+                // Use the fetched dogs from Firebase
+                final firebaseDogs = firebaseSnapshot.data ?? [];
+                dogs.addAll(firebaseDogs); // Combine saved and Firebase dogs
+                if (dogs.isEmpty) {
+                  return const Center(child: Text('Brak psów.'));
+                }
+
+                return CustomScrollView(
+                  slivers: [
+                    SliverPadding(
+                      padding: const EdgeInsetsDirectional.all(16),
+                      sliver: SliverList.separated(
+                        itemCount: dogs.length,
+                        itemBuilder: (context, index) {
+                          final dog = dogs[index];
+                          return GestureDetector(
+                            onTap: () => _showDogDetails(dog),
+                            child: DogCard(
+                              dog: dog,
+                              onFavoriteToggle: () {
+                                _toggleSaved(dog);
+                              },
+                            ),
+                          );
+                        },
+                        separatorBuilder: (context, _) => const SizedBox(height: 16),
+                      ),
+                    ),
+                  ],
+                );
+              },
             );
           }
 
-          final dogs = snapshot.data!.docs.map((doc) {
-            final data = doc.data() as Map<String, dynamic>;
-            return Dog.fromMap(data, id: doc.id);
-          }).toList();
+          // If showing only saved dogs, handle HiveBox
+          if (dogs.isEmpty) {
+            return const Center(child: Text('Brak zapisanych psów.'));
+          }
 
           return CustomScrollView(
             slivers: [
@@ -125,30 +193,14 @@ class _DogsListScreenState extends State<DogsListScreen> {
                   itemCount: dogs.length,
                   itemBuilder: (context, index) {
                     final dog = dogs[index];
-                    return FutureBuilder<bool>(
-                      future: _isDogSaved(dog),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-
-                        if (snapshot.hasError) {
-                          return Center(child: Text('Błąd: ${snapshot.error}'));
-                        }
-
-                        final isSaved = snapshot.data ?? false;
-                        dog.isSaved = isSaved;
-
-                        return GestureDetector(
-                          onTap: () => _showDogDetails(dog), 
-                          child: DogCard(
-                            dog: dog,
-                            onFavoriteToggle: () {
-                              _toggleSaved(dog);
-                            },
-                          ),
-                        );
-                      },
+                    return GestureDetector(
+                      onTap: () => _showDogDetails(dog),
+                      child: DogCard(
+                        dog: dog,
+                        onFavoriteToggle: () {
+                          _toggleSaved(dog);
+                        },
+                      ),
                     );
                   },
                   separatorBuilder: (context, _) => const SizedBox(height: 16),
@@ -157,32 +209,82 @@ class _DogsListScreenState extends State<DogsListScreen> {
             ],
           );
         },
-      ),
-      floatingActionButton: FutureBuilder<bool>(
-        future: _isUserVolunteer(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SizedBox.shrink(); 
-          }
+      );
+    },
+  ),
+  floatingActionButton: FutureBuilder<bool>(
+    future: _isUserVolunteer(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const SizedBox.shrink();
+      }
 
-          if (snapshot.data == true) {
-            return FloatingActionButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return const AddDogForm();
-                  },
-                );
+      if (snapshot.data == true) {
+        return FloatingActionButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return const AddDogForm();
               },
-              child: const Icon(Icons.add),
             );
-          } else {
-            return const SizedBox.shrink(); 
-          }
-        },
-      ),
+          },
+          child: const Icon(Icons.add),
+        );
+      } else {
+        return const SizedBox.shrink();
+      }
+    },
+  ),
+);
+  }
+
+  Widget _buildDogList(List<Dog> dogs) {
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsetsDirectional.all(16),
+          sliver: SliverList.separated(
+            itemCount: dogs.length,
+            itemBuilder: (context, index) {
+              final dog = dogs[index];
+              return GestureDetector(
+                onTap: () => _showDogDetails(dog),
+                child: DogCard(
+                  dog: dog,
+                  onFavoriteToggle: () {
+                    _toggleSaved(dog);
+                  },
+                ),
+              );
+            },
+            separatorBuilder: (context, _) => const SizedBox(height: 16),
+          ),
+        ),
+      ],
     );
+  }
+
+  Future<List<Dog>> _getDogsFromFirebase() async {
+    final dogsQuery = FirebaseFirestore.instance
+        .collection('dogs')
+        .orderBy('numberOfSaves', descending: !_isSortedBySaves);
+
+    final querySnapshot = await dogsQuery.get();
+    final dogs = querySnapshot.docs.map((doc) {
+      return Dog.fromMap(doc.data(), id: doc.id);
+    }).toList();
+
+    return dogs;
+  }
+
+  Future<bool> _isUserVolunteer() async {
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(_currentUser.uid)
+        .get();
+    final data = userDoc.data();
+    return data != null && data['isVolunteer'] == true;
   }
 
   void _logout() async {
@@ -197,41 +299,55 @@ class _DogsListScreenState extends State<DogsListScreen> {
     }
   }
 
-  Future<bool> _isDogSaved(Dog dog) async {
-    final savedDogDoc = await _savedDogsCollection.doc(dog.id).get();
-    return savedDogDoc.exists;
-  }
-
-  void _toggleSaved(Dog dog) async {
+  Future<void> _toggleSaved(Dog dog) async {
     if (dog.id.isEmpty) {
       print("Błąd: Dog ID is empty. Cannot toggle favorite.");
       return;
     }
 
     final dogRef = FirebaseFirestore.instance.collection('dogs').doc(dog.id);
-    final savedDogRef = _savedDogsCollection.doc(dog.id); 
+    final savedDogRef = _savedDogsCollection.doc(dog.id);
 
     try {
-      final isAlreadySaved = await savedDogRef.get().then((doc) => doc.exists);
-
-      if (isAlreadySaved) {
-        await savedDogRef.delete();
-        await dogRef.update({
-          'isSaved': false,
-          'numberOfSaves': FieldValue.increment(-1),
-        });
+      final isAlreadySavedLocal = _savedDogsBox?.containsKey(dog.id) ?? false;
+      if (isAlreadySavedLocal) {
+        await _savedDogsBox?.delete(dog.id);
       } else {
-        await savedDogRef.set(dog.toMap());
-        await dogRef.update({
-          'isSaved': true,
-          'numberOfSaves': FieldValue.increment(1),
-        });
+        await _savedDogsBox?.put(dog.id, dog);    
         _showSaveAnimation(context);
       }
 
       setState(() {
         dog.isSaved = !dog.isSaved;
       });
+
+  NetworkStatusService networkStatusService = NetworkStatusService(); 
+      if(await networkStatusService.isOnline) {
+        final isAlreadySaved = await savedDogRef.get().then((doc) => doc.exists);
+        
+        final dogRef = FirebaseFirestore.instance.collection('dogs').doc(dog.id);
+
+        if (isAlreadySaved) {
+          await savedDogRef.delete();
+          await dogRef.update({
+            'isSaved': false,
+            'numberOfSaves': FieldValue.increment(-1),
+          });
+        } else {
+          await savedDogRef.set(dog.toMap());
+          await dogRef.update({
+            'isSaved': true,
+            'numberOfSaves': FieldValue.increment(1),
+          });
+        }
+      } else {
+        final syncAction = SyncAction(
+        actionType: isAlreadySavedLocal ? 'delete' : 'save',
+        dogId: dog.id,
+        timestamp: DateTime.now(),
+      );
+      await Hive.box<SyncAction>('sync_actions').add(syncAction);
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Błąd przy zapisywaniu psa: $e")));
     }
@@ -265,108 +381,65 @@ class _DogsListScreenState extends State<DogsListScreen> {
     );
   }
 
-  Stream<QuerySnapshot<Object?>> _getDogQuery() {
-    if (_showOnlySaved) {
-      return _savedDogsCollection.snapshots(); 
-    } else {
-      return FirebaseFirestore.instance
-          .collection('dogs')
-          .orderBy('numberOfSaves', descending: !_isSortedBySaves)
-          .snapshots();
-    }
-  }
-
-  Future<bool> _isUserVolunteer() async {
-    final userDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(_currentUser.uid)
-        .get();
-    final data = userDoc.data();
-    return data != null && data['isVolunteer'] == true;
-  }
-
   void _showDogDetails(Dog dog) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return Dialog(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      dog.name,
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () {
-                        Navigator.of(context).pop(); 
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                if (dog.imageUrl.isNotEmpty)
-                  Image.network(
-                    dog.imageUrl,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  ),
-                const SizedBox(height: 16),
-                Text(
-                  'Imię: ${dog.name}',
-                  style: const TextStyle(fontSize: 18),
-                ),
-                Text(
-                  'Wiek: ${dog.age}',
-                  style: const TextStyle(fontSize: 18),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Opis: ${dog.description}',
-                  style: const TextStyle(fontSize: 18),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Lokalizacja: ${dog.location}',
-                  style: const TextStyle(fontSize: 18),
-                ),
-                const SizedBox(height: 16),
-
-                FutureBuilder<bool>(
-                  future: _isUserVolunteer(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const SizedBox.shrink(); 
-                    }
-
-                    if (snapshot.data == true) {
-                      return ElevatedButton(
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        dog.name,
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
                         onPressed: () {
-                          context.go(
-                            '/dog-details/${dog.id}',
-                            extra: dog,
-                          );
+                          Navigator.of(context).pop();
                         },
-                        child: const Text('Edytuj'),
-                      );
-                    }
-
-                    return const SizedBox.shrink(); 
-                  },
-                ),
-              ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  if (dog.imageUrl.isNotEmpty)
+                    Image.network(
+                      dog.imageUrl,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Imię: ${dog.name}',
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  Text(
+                    'Wiek: ${dog.age}',
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Opis: ${dog.description}',
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Lokalizacja: ${dog.location}',
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 }
