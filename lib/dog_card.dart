@@ -5,8 +5,9 @@ import 'dog_class.dart';
 class DogCard extends StatelessWidget {
   final Dog dog;
   final VoidCallback onFavoriteToggle;
+  final bool isFavorite;
 
-  const DogCard({super.key, required this.dog, required this.onFavoriteToggle});
+  const DogCard({super.key, required this.dog, required this.onFavoriteToggle, required this.isFavorite,});
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +21,8 @@ class DogCard extends StatelessWidget {
           children: [
             IconButton(
               icon: Icon(
-                dog.isSaved ? Icons.star : Icons.star_border, 
-                color: dog.isSaved ? Colors.yellow : Colors.grey,
+                isFavorite ? Icons.star : Icons.star_border, 
+                color: isFavorite ? Colors.yellow : Colors.grey,
               ),
               onPressed: onFavoriteToggle,
             ),

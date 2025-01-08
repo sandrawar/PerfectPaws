@@ -34,6 +34,7 @@ class _DogsListScreenState extends State<DogsListScreen> {
 
   Future<void> _openBox() async {
     _savedDogsBox = await Hive.openBox<Dog>('saved_dogs');
+    //_savedDogsBox?.clear();
   }
 
   Future<void> _initializeSyncService() async {
@@ -167,7 +168,8 @@ class _DogsListScreenState extends State<DogsListScreen> {
                               dog: dog,
                               onFavoriteToggle: () {
                                 _toggleSaved(dog);
-                              },
+                              },                     
+                        isFavorite: dog.isSaved
                             ),
                           );
                         },
@@ -200,6 +202,7 @@ class _DogsListScreenState extends State<DogsListScreen> {
                         onFavoriteToggle: () {
                           _toggleSaved(dog);
                         },
+                        isFavorite: dog.isSaved
                       ),
                     );
                   },
@@ -255,6 +258,7 @@ class _DogsListScreenState extends State<DogsListScreen> {
                   onFavoriteToggle: () {
                     _toggleSaved(dog);
                   },
+                  isFavorite: dog.isSaved,
                 ),
               );
             },
@@ -317,10 +321,6 @@ class _DogsListScreenState extends State<DogsListScreen> {
         _showSaveAnimation(context);
       }
 
-      setState(() {
-        dog.isSaved = !dog.isSaved;
-      });
-
   NetworkStatusService networkStatusService = NetworkStatusService(); 
       if(await networkStatusService.isOnline) {
         final isAlreadySaved = await savedDogRef.get().then((doc) => doc.exists);
@@ -351,35 +351,32 @@ class _DogsListScreenState extends State<DogsListScreen> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Błąd przy zapisywaniu psa: $e")));
     }
+    setState(() {
+        dog.isSaved = !dog.isSaved;
+      });
   }
 
-  void _showSaveAnimation(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => Center(
-        child: kIsWeb
-            ? Lottie.asset(
-                'success.json',
-                repeat: false,
-                onLoaded: (composition) {
-                  Future.delayed(composition.duration, () {
-                    Navigator.of(context).pop();
-                  });
-                },
-              )
-            : Lottie.asset(
-                'assets/success.json',
-                repeat: false,
-                onLoaded: (composition) {
-                  Future.delayed(composition.duration, () {
-                    Navigator.of(context).pop();
-                  });
-                },
-              ),
-      ),
-      barrierDismissible: false,
-    );
-  }
+void _showSaveAnimation(BuildContext conext) {
+  showDialog(
+    context: context,
+    barrierDismissible: false, 
+    builder: (context) {
+      return Dialog(
+        backgroundColor: Colors.transparent,
+        child: Lottie.asset(
+          'assets/success.json', 
+          repeat: false, 
+          onLoaded: (composition) {
+            Future.delayed(composition.duration, () {
+              Navigator.of(context).pop();
+            });
+          },
+        ),
+      );
+    },
+  );
+}
+
 
   void _showDogDetails(Dog dog) {
     showDialog(
