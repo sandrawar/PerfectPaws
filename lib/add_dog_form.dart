@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:camera/camera.dart';
 import 'dart:io';  // Do obsługi plików
 import 'dog_class.dart';
+import 'package:image_picker/image_picker.dart';  // Importujemy image_picker
 
 class AddDogForm extends StatefulWidget {
   const AddDogForm({super.key});
@@ -26,6 +27,7 @@ class _AddDogFormState extends State<AddDogForm> {
   CameraController? _controller;  // Kontroler kamery
   List<CameraDescription> _cameras = [];  // Lista kamer
   bool _isCameraInitialized = false;
+  final ImagePicker _picker = ImagePicker(); // Inicjalizujemy image_picker
 
   @override
   void initState() {
@@ -50,6 +52,7 @@ class _AddDogFormState extends State<AddDogForm> {
     });
   }
 
+  // Funkcja robienia zdjęcia
   Future<void> _takePicture() async {
     if (!_controller!.value.isInitialized) {
       print("Kamera nie została zainicjowana.");
@@ -60,25 +63,36 @@ class _AddDogFormState extends State<AddDogForm> {
       final XFile photo = await _controller!.takePicture();
       setState(() {
         _image = photo;
-        _imageController.text = photo.path;  // Ustawiamy ścieżkę zdjęcia
+        _imageController.text = photo.path; 
       });
     } catch (e) {
       print("Błąd przy robieniu zdjęcia: $e");
     }
   }
 
+  Future<void> _pickImageFromGallery() async {
+    try {
+      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        setState(() {
+          _image = pickedFile;
+          _imageController.text = pickedFile.path;
+        });
+      }
+    } catch (e) {
+      print("Błąd przy wyborze zdjęcia z galerii: $e");
+    }
+  }
+
   Future<String> _uploadImageToFirebase(XFile image) async {
     try {
       final file = File(image.path);
-      // Tworzymy referencję do lokalizacji w Firebase Storage
       final storageReference = FirebaseStorage.instance
           .ref()
           .child('dogs_images/${DateTime.now().millisecondsSinceEpoch}.jpg');
       
-      // Przesyłamy obraz do Firebase Storage
       await storageReference.putFile(file);
 
-      // Pobieramy URL zdjęcia
       final imageUrl = await storageReference.getDownloadURL();
       return imageUrl;
     } catch (e) {
@@ -118,16 +132,19 @@ class _AddDogFormState extends State<AddDogForm> {
                 },
               ),
             ] else if (_currentStep == 1) ...[
-              // Pokazujemy kamerę, jeśli zainicjowano
               if (_isCameraInitialized)
                 SizedBox(
                   height: 300,
                   width: double.infinity,
-                  child: CameraPreview(_controller!),  // Podgląd kamery
+                  child: CameraPreview(_controller!),  
                 ),
               ElevatedButton(
                 onPressed: _takePicture,
                 child: const Text('Zrób zdjęcie psa'),
+              ),
+              ElevatedButton(
+                onPressed: _pickImageFromGallery,
+                child: const Text('Wybierz zdjęcie z galerii'),
               ),
               if (_image != null) ...[
                 Image.file(
@@ -223,7 +240,6 @@ class _AddDogFormState extends State<AddDogForm> {
       final location = _locationController.text; 
       final volunteer = _volunteerController.text;
 
-      // Upload the image to Firebase Storage and get the URL
       String? imageUrl = '';
       if (_image != null) {
         imageUrl = await _uploadImageToFirebase(_image!);
