@@ -24,11 +24,11 @@ class SyncService {
         if (action != null) {
           try {
             if (action.actionType == 'save') {
-              await _saveDogToFirebase(action.dogId);
+              _saveDogToFirebase(action.dogId);
             } else if (action.actionType == 'delete') {
-              await _deleteDogFromFirebase(action.dogId, index);
+              _deleteDogFromFirebase(action.dogId, index);
             }
-            await _syncActionBox.delete(key); 
+            _syncActionBox.delete(key); 
           } catch (e) {
             print('Błąd przy synchronizacji: $e');
           }
