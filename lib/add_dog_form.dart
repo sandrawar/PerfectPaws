@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:camera/camera.dart';
+import 'dart:io';  // Do obsługi plików
 import 'dog_class.dart';
 
 class AddDogForm extends StatefulWidget {
@@ -19,17 +22,68 @@ class _AddDogFormState extends State<AddDogForm> {
   final _volunteerController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   int _currentStep = 0;
+  XFile? _image; // Do przechowywania zdjęcia
+  CameraController? _controller;  // Kontroler kamery
+  List<CameraDescription> _cameras = [];  // Lista kamer
+  bool _isCameraInitialized = false;
 
   @override
   void initState() {
     super.initState();
     _setVolunteerEmail();
+    _initializeCamera();
   }
 
   void _setVolunteerEmail() {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       _volunteerController.text = user.email ?? '';
+    }
+  }
+
+  Future<void> _initializeCamera() async {
+    _cameras = await availableCameras();  // Pobieramy dostępne kamery
+    _controller = CameraController(_cameras[0], ResolutionPreset.high);  // Wybieramy pierwszą kamerę
+    await _controller!.initialize();
+    setState(() {
+      _isCameraInitialized = true;
+    });
+  }
+
+  Future<void> _takePicture() async {
+    if (!_controller!.value.isInitialized) {
+      print("Kamera nie została zainicjowana.");
+      return;
+    }
+
+    try {
+      final XFile photo = await _controller!.takePicture();
+      setState(() {
+        _image = photo;
+        _imageController.text = photo.path;  // Ustawiamy ścieżkę zdjęcia
+      });
+    } catch (e) {
+      print("Błąd przy robieniu zdjęcia: $e");
+    }
+  }
+
+  Future<String> _uploadImageToFirebase(XFile image) async {
+    try {
+      final file = File(image.path);
+      // Tworzymy referencję do lokalizacji w Firebase Storage
+      final storageReference = FirebaseStorage.instance
+          .ref()
+          .child('dogs_images/${DateTime.now().millisecondsSinceEpoch}.jpg');
+      
+      // Przesyłamy obraz do Firebase Storage
+      await storageReference.putFile(file);
+
+      // Pobieramy URL zdjęcia
+      final imageUrl = await storageReference.getDownloadURL();
+      return imageUrl;
+    } catch (e) {
+      print("Błąd przy wysyłaniu zdjęcia: $e");
+      throw Exception("Nie udało się przesłać zdjęcia do Firebase Storage");
     }
   }
 
@@ -64,20 +118,26 @@ class _AddDogFormState extends State<AddDogForm> {
                 },
               ),
             ] else if (_currentStep == 1) ...[
-              TextFormField(
-                controller: _imageController,
-                decoration: const InputDecoration(labelText: 'URL zdjęcia psa'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Proszę podać URL zdjęcia';
-                  }
-                  const urlPattern = r'^(http|https):\/\/[^ "]+$';
-                  if (!RegExp(urlPattern).hasMatch(value)) {
-                    return 'Nieprawidłowy URL';
-                  }
-                  return null;
-                },
+              // Pokazujemy kamerę, jeśli zainicjowano
+              if (_isCameraInitialized)
+                SizedBox(
+                  height: 300,
+                  width: double.infinity,
+                  child: CameraPreview(_controller!),  // Podgląd kamery
+                ),
+              ElevatedButton(
+                onPressed: _takePicture,
+                child: const Text('Zrób zdjęcie psa'),
               ),
+              if (_image != null) ...[
+                Image.file(
+                  File(_image!.path),
+                  height: 150,
+                  width: 150,
+                  fit: BoxFit.cover,
+                ),
+                const SizedBox(height: 10),
+              ],
               TextFormField(
                 controller: _locationController,
                 decoration: const InputDecoration(labelText: 'Lokalizacja psa'),
@@ -158,11 +218,16 @@ class _AddDogFormState extends State<AddDogForm> {
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       final name = _nameController.text;
-      final imageUrl = _imageController.text;
-      final age = int.parse(_ageController.text);
       final description = _descriptionController.text; 
+      final age = int.parse(_ageController.text);
       final location = _locationController.text; 
       final volunteer = _volunteerController.text;
+
+      // Upload the image to Firebase Storage and get the URL
+      String? imageUrl = '';
+      if (_image != null) {
+        imageUrl = await _uploadImageToFirebase(_image!);
+      }
 
       final dog = Dog(
         name: name,
