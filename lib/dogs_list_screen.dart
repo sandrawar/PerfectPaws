@@ -15,6 +15,9 @@ import 'dog_card.dart';
 import 'package:flutter/foundation.dart';
 import 'volunteer_dog_list_screen.dart';
 import 'networ_status.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class DogsListScreen extends StatefulWidget {
   const DogsListScreen({super.key});
@@ -58,9 +61,11 @@ class _DogsListScreenState extends State<DogsListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+
+    final localizations = AppLocalizations.of(context);
+  return Scaffold(
   appBar: AppBar(
-    title: const Text('Dogs'),
+  title: Text(localizations!.dogs),
     actions: [
       IconButton(
         icon: Icon(_showOnlySaved ? Icons.list : Icons.star),

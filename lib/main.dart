@@ -15,6 +15,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'dogs_list_screen.dart'; 
 import 'login_screen.dart'; 
 import 'register_screen.dart'; 
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,8 +55,21 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        AppLocalizations.delegate
+      ],
+      supportedLocales: const [
+        Locale('en', 'US'), 
+        Locale('es', 'ES'),
+        Locale('pl', 'PL'), 
+      ],     
       routerConfig: _router,
-      title: 'Perfect Paws',
+      title: "Perfect Paws",
+      onGenerateTitle: (BuildContext context) =>
+          AppLocalizations.of(context)?.helloWorld ?? 'Perfect Paws',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.deepOrange,
