@@ -7,6 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:perfect_paws/message_list_screen.dart';
 import 'package:perfect_paws/networ_status.dart';
+import 'package:perfect_paws/settings_screen.dart';
 import 'package:perfect_paws/sync_act.dart';
 import 'package:perfect_paws/sync_service.dart';
 import 'add_dog_form.dart';
@@ -18,6 +19,7 @@ import 'networ_status.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'settings_screen.dart';
 
 class DogsListScreen extends StatefulWidget {
   const DogsListScreen({super.key});
@@ -62,7 +64,7 @@ class _DogsListScreenState extends State<DogsListScreen> {
   @override
   Widget build(BuildContext context) {
 
-    final localizations = AppLocalizations.of(context);
+  final localizations = AppLocalizations.of(context);
   return Scaffold(
   appBar: AppBar(
   title: Text(localizations!.dogs),
@@ -92,6 +94,17 @@ class _DogsListScreenState extends State<DogsListScreen> {
             context,
             MaterialPageRoute(
               builder: (context) => const MessagesListScreen(),
+            ),
+          );
+        },
+      ),
+      IconButton(
+        icon: const Icon(Icons.settings),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const SettingsScreen(),
             ),
           );
         },

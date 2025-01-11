@@ -4,5 +4,6 @@
       "description": "The conventional newborn programmer greeting"
     },
     "dogs": "Dogs",
-    "@dogs": {}
+    "@dogs": {},
+    "settings": "Settings"
   }

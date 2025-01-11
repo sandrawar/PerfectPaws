@@ -1,5 +1,6 @@
 {
     "helloWorld": "¡Hola Mundo!",
     "dogs": "Perros",
-    "@dogs": {}
+    "@dogs": {},
+    "settings": "Settings in spain"
 }

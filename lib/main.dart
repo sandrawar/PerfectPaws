@@ -12,12 +12,15 @@ import 'package:perfect_paws/sync_act.dart';
 import 'package:perfect_paws/sync_service.dart';
 import 'package:perfect_paws/volunteer_dog_list_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 import 'dogs_list_screen.dart'; 
 import 'login_screen.dart'; 
 import 'register_screen.dart'; 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'locale_provider.dart';
+import 'settings_screen.dart';
 
 
 Future<void> main() async {
@@ -46,7 +49,10 @@ Future<void> main() async {
     }
   });
   
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (_) => LocaleProvider(),
+      child: const MyApp(),
+    ));
 }
 
 class MyApp extends StatelessWidget {
@@ -54,6 +60,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localeProvider = Provider.of<LocaleProvider>(context);
     return MaterialApp.router(
 
       localizationsDelegates: const [
@@ -70,6 +77,8 @@ class MyApp extends StatelessWidget {
       title: "Perfect Paws",
       onGenerateTitle: (BuildContext context) =>
           AppLocalizations.of(context)?.helloWorld ?? 'Perfect Paws',
+      locale: localeProvider.locale,
+
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.deepOrange,
@@ -122,6 +131,10 @@ final GoRouter _router = GoRouter(
       path: '/volunteer-dogs',
       name: 'volunteerDogs',
       builder: (context, state) => const VolunteerDogsListScreen(),
+    ),GoRoute(
+      path: '/settings',
+      name: 'settings',
+      builder: (context, state) => const SettingsScreen(),
     ),
     GoRoute(
       path: '/dog-details/:id',
