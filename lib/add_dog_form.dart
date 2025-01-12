@@ -3,9 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:camera/camera.dart';
-import 'dart:io';  // Do obsługi plików
+import 'dart:io';  
 import 'dog_class.dart';
-import 'package:image_picker/image_picker.dart';  // Importujemy image_picker
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';  
 
 class AddDogForm extends StatefulWidget {
   const AddDogForm({super.key});
@@ -23,11 +24,11 @@ class _AddDogFormState extends State<AddDogForm> {
   final _volunteerController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   int _currentStep = 0;
-  XFile? _image; // Do przechowywania zdjęcia
-  CameraController? _controller;  // Kontroler kamery
-  List<CameraDescription> _cameras = [];  // Lista kamer
+  XFile? _image; 
+  CameraController? _controller;  
+  List<CameraDescription> _cameras = [];  
   bool _isCameraInitialized = false;
-  final ImagePicker _picker = ImagePicker(); // Inicjalizujemy image_picker
+  final ImagePicker _picker = ImagePicker(); 
 
   @override
   void initState() {
@@ -44,18 +45,16 @@ class _AddDogFormState extends State<AddDogForm> {
   }
 
   Future<void> _initializeCamera() async {
-    _cameras = await availableCameras();  // Pobieramy dostępne kamery
-    _controller = CameraController(_cameras[0], ResolutionPreset.high);  // Wybieramy pierwszą kamerę
+    _cameras = await availableCameras();  
+    _controller = CameraController(_cameras[0], ResolutionPreset.high);  
     await _controller!.initialize();
     setState(() {
       _isCameraInitialized = true;
     });
   }
 
-  // Funkcja robienia zdjęcia
   Future<void> _takePicture() async {
     if (!_controller!.value.isInitialized) {
-      print("Kamera nie została zainicjowana.");
       return;
     }
 
@@ -65,9 +64,7 @@ class _AddDogFormState extends State<AddDogForm> {
         _image = photo;
         _imageController.text = photo.path; 
       });
-    } catch (e) {
-      print("Błąd przy robieniu zdjęcia: $e");
-    }
+    } catch (e) {}
   }
 
   Future<void> _pickImageFromGallery() async {
@@ -80,7 +77,6 @@ class _AddDogFormState extends State<AddDogForm> {
         });
       }
     } catch (e) {
-      print("Błąd przy wyborze zdjęcia z galerii: $e");
     }
   }
 
@@ -96,15 +92,16 @@ class _AddDogFormState extends State<AddDogForm> {
       final imageUrl = await storageReference.getDownloadURL();
       return imageUrl;
     } catch (e) {
-      print("Błąd przy wysyłaniu zdjęcia: $e");
       throw Exception("Nie udało się przesłać zdjęcia do Firebase Storage");
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    
+  final localizations = AppLocalizations.of(context);
     return AlertDialog(
-      title: const Text('Dodaj psa'),
+      title: Text(localizations!.addDog),
       content: Form(
         key: _formKey,
         child: Column(
@@ -113,20 +110,20 @@ class _AddDogFormState extends State<AddDogForm> {
             if (_currentStep == 0) ...[
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Imię psa'),
+                decoration: InputDecoration(labelText: localizations.dogsName),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Proszę podać imię psa';
+                    return localizations.dogsNameNullCheck;
                   }
                   return null;
                 },
               ),
               TextFormField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(labelText: 'Opis psa'),
+                decoration: InputDecoration(labelText: localizations.dogsDescription),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Proszę podać opis psa';
+                    return localizations.dogsDescriptionNullCheck;
                   }
                   return null;
                 },
@@ -140,11 +137,11 @@ class _AddDogFormState extends State<AddDogForm> {
                 ),
               ElevatedButton(
                 onPressed: _takePicture,
-                child: const Text('Zrób zdjęcie psa'),
+                child: Text(localizations.takePicture),
               ),
               ElevatedButton(
                 onPressed: _pickImageFromGallery,
-                child: const Text('Wybierz zdjęcie z galerii'),
+                child: Text(localizations.choosePicture),
               ),
               if (_image != null) ...[
                 Image.file(
@@ -157,10 +154,10 @@ class _AddDogFormState extends State<AddDogForm> {
               ],
               TextFormField(
                 controller: _locationController,
-                decoration: const InputDecoration(labelText: 'Lokalizacja psa'),
+                decoration: InputDecoration(labelText: localizations.dogsLocation),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Proszę podać lokalizację psa';
+                    return localizations.dogsLocationNullCheck;
                   }
                   return null;
                 },
@@ -168,10 +165,10 @@ class _AddDogFormState extends State<AddDogForm> {
             ] else if (_currentStep == 2) ...[
               TextFormField(
                 controller: _ageController,
-                decoration: const InputDecoration(labelText: 'Wiek psa'),
+                decoration: InputDecoration(labelText: localizations.dogsAge),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Proszę podać wiek psa';
+                    return localizations.dogsAgeNullCheck;
                   }
                   return null;
                 },
@@ -179,10 +176,10 @@ class _AddDogFormState extends State<AddDogForm> {
               ),
               TextFormField(
                 controller: _volunteerController,
-                decoration: const InputDecoration(labelText: 'Wolontariusz'),
+                decoration: InputDecoration(labelText: localizations.volunteer),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Proszę podać nazwisko wolontariusza';
+                    return localizations.volunteerNullCheck;
                   }
                   return null;
                 },
@@ -196,23 +193,23 @@ class _AddDogFormState extends State<AddDogForm> {
         if (_currentStep > 0)
           TextButton(
             onPressed: _previousStep,
-            child: const Text('Wstecz'),
+            child: Text(localizations.prev),
           ),
         if (_currentStep < 2)
           TextButton(
             onPressed: _nextStep,
-            child: const Text('Dalej'),
+            child: Text(localizations.next),
           ),
         if (_currentStep == 2)
           TextButton(
             onPressed: _submitForm,
-            child: const Text('Dodaj'),
+            child: Text(localizations.add),
           ),
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text('Anuluj'),
+          child: Text(localizations.cancel),
         ),
       ],
     );
@@ -233,6 +230,7 @@ class _AddDogFormState extends State<AddDogForm> {
   }
 
   void _submitForm() async {
+    final localizations = AppLocalizations.of(context);
     if (_formKey.currentState!.validate()) {
       final name = _nameController.text;
       final description = _descriptionController.text; 
@@ -258,7 +256,7 @@ class _AddDogFormState extends State<AddDogForm> {
       try {
         await FirebaseFirestore.instance.collection('dogs').add(dog.toMap());
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Pies dodany!')),
+          SnackBar(content: Text(localizations!.dogAdded)),
         );
         Navigator.of(context).pop();
       } catch (e) {

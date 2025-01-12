@@ -149,10 +149,9 @@ class _DogsListScreenState extends State<DogsListScreen> {
         valueListenable: _savedDogsBox!.listenable(),
         builder: (context, Box<Dog> box, _) {
           final dogs = _showOnlySaved
-              ? box.values.toList() // When showing saved dogs, use HiveBox
-              : []; // Initially empty list for Firebase dogs
+              ? box.values.toList() 
+              : []; 
 
-          // If we're not showing only saved dogs, fetch them from Firebase
           if (!_showOnlySaved) {
             return FutureBuilder<List<Dog>>(
               future: _getDogsFromFirebase(),
@@ -165,11 +164,10 @@ class _DogsListScreenState extends State<DogsListScreen> {
                   return Center(child: Text('Błąd pobierania psów: ${firebaseSnapshot.error}'));
                 }
 
-                // Use the fetched dogs from Firebase
                 final firebaseDogs = firebaseSnapshot.data ?? [];
-                dogs.addAll(firebaseDogs); // Combine saved and Firebase dogs
+                dogs.addAll(firebaseDogs); 
                 if (dogs.isEmpty) {
-                  return const Center(child: Text('Brak psów.'));
+                  return Center(child: Text(localizations!.emptyDogsList));
                 }
 
                 return CustomScrollView(
@@ -200,9 +198,8 @@ class _DogsListScreenState extends State<DogsListScreen> {
             );
           }
 
-          // If showing only saved dogs, handle HiveBox
           if (dogs.isEmpty) {
-            return const Center(child: Text('Brak zapisanych psów.'));
+            return Center(child: Text(localizations!.emptySavedDogsList));
           }
 
           return CustomScrollView(
@@ -314,7 +311,6 @@ class _DogsListScreenState extends State<DogsListScreen> {
       await FirebaseAuth.instance.signOut();
       context.go('/login');
     } catch (e) {
-      print("Błąd przy wylogowywaniu: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Błąd przy wylogowywaniu: $e")),
       );
@@ -323,7 +319,6 @@ class _DogsListScreenState extends State<DogsListScreen> {
 
   Future<void> _toggleSaved(Dog dog) async {
     if (dog.id.isEmpty) {
-      print("Błąd: Dog ID is empty. Cannot toggle favorite.");
       return;
     }
 

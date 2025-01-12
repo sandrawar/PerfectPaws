@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:perfect_paws/dog_class.dart';
-import 'package:go_router/go_router.dart';  
+import 'package:go_router/go_router.dart'; 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; 
 
 class DogDetailsScreen extends StatefulWidget {
   final Dog dog;
@@ -38,6 +39,8 @@ class _DogDetailsScreenState extends State<DogDetailsScreen> {
   }
 
   void _updateDogData() async {
+    
+  final localizations = AppLocalizations.of(context);
     final updatedDog = widget.dog.copyWith(
       name: _nameController.text,
       age: int.tryParse(_ageController.text) ?? widget.dog.age,
@@ -52,19 +55,21 @@ class _DogDetailsScreenState extends State<DogDetailsScreen> {
           .update(updatedDog.toMap());
       
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Dane psa zaktualizowane!')),
+        SnackBar(content: Text(localizations!.dogsDataUpdated)),
       );
 
       context.go('/volunteer-dogs');  
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Błąd podczas aktualizacji: $e')),
+        SnackBar(content: Text(localizations!.dogsDataUpdateError)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    
+  final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.dog.name),
@@ -85,29 +90,29 @@ class _DogDetailsScreenState extends State<DogDetailsScreen> {
             const SizedBox(height: 16),
             TextField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Imię psa'),
+              decoration: InputDecoration(labelText: localizations!.dogsName),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _ageController,
-              decoration: const InputDecoration(labelText: 'Wiek psa'),
+              decoration: InputDecoration(labelText: localizations.dogsAge),
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _descriptionController,
-              decoration: const InputDecoration(labelText: 'Opis psa'),
+              decoration: InputDecoration(labelText: localizations.dogsDescription),
               maxLines: 3,
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _locationController,
-              decoration: const InputDecoration(labelText: 'Lokalizacja psa'),
+              decoration: InputDecoration(labelText: localizations.dogsLocation),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _updateDogData,
-              child: const Text('Zapisz zmiany'),
+              child: Text(localizations.saveChanges),
             ),
           ],
         ),

@@ -75,8 +75,6 @@ class MyApp extends StatelessWidget {
       ],     
       routerConfig: _router,
       title: "Perfect Paws",
-      onGenerateTitle: (BuildContext context) =>
-          AppLocalizations.of(context)?.helloWorld ?? 'Perfect Paws',
       locale: localeProvider.locale,
 
       theme: ThemeData(

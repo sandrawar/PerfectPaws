@@ -1,9 +1,28 @@
 {
-    "helloWorld": "Hello World!",
-    "@helloWorld": {
-      "description": "The conventional newborn programmer greeting"
-    },
     "dogs": "Dogs",
     "@dogs": {},
-    "settings": "Settings"
+    "settings": "Settings",
+    "emptyDogsList": "There are no dogs to see at the moment",
+    "emptySavedDogsList" : "You have no saved dogs",
+    "addDog" : "Add dog",
+    "dogsName" : "Dog's name",
+    "dogsDescription" : "Dog's description",
+    "dogsAge" : "Dog's age",
+    "dogsLocation": "Dog's location",
+    "next" : "Next",
+    "prev" : "Previous",
+    "add" : "Add",
+    "cancel" : "Cancel",
+    "dogAdded" : "Dog added!",
+    "volunteer" : "Wolontariusz",
+    "volunteerNullCheck" : "Fill the volunteer name, please",
+    "dogsAgeNullCheck" : "Fill the dog's age, please",
+    "dogsLocationNullCheck" : "Fill the dog's location, please",
+    "dogsNameNullCheck" : "Fill the dog's name, please",
+    "dogsDescriptionNullCheck" : "Fill the dog's description, please",
+    "takePicture" : "Take a dog's picture",
+    "choosePicture" : "Choose a dog's photo from your gallery",
+    "saveChanges" : "Save changes",
+    "dogsDataUpdated" : "Dog's data updated!",
+    "dogsDataUpdateError" : "Dog's data update failed"
   }

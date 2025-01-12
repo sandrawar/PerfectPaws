@@ -5,13 +5,13 @@ part 'sync_act.g.dart';
 @HiveType(typeId: 1)
 class SyncAction {
   @HiveField(0)
-  final String actionType; // Typ akcji, np. "add" lub "remove".
+  final String actionType; 
   
   @HiveField(1)
-  final String dogId; // Id psa.
+  final String dogId; 
   
   @HiveField(2)
-  final DateTime timestamp; // Czas utworzenia akcji.
+  final DateTime timestamp; 
 
   SyncAction({
     required this.actionType,
@@ -19,7 +19,6 @@ class SyncAction {
     required this.timestamp,
   });
 
-  // Serializacja do mapy
   Map<String, dynamic> toMap() {
     return {
       'actionType': actionType,
@@ -28,7 +27,6 @@ class SyncAction {
     };
   }
 
-  // Deserializacja z mapy
   factory SyncAction.fromMap(Map<String, dynamic> map) {
     return SyncAction(
       actionType: map['actionType'] as String,
