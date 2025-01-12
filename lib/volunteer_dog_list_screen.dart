@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'dog_class.dart';
 import 'add_dog_form.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class VolunteerDogsListScreen extends StatefulWidget {
   const VolunteerDogsListScreen({super.key});
 
@@ -33,9 +35,11 @@ class _VolunteerDogsListScreenState extends State<VolunteerDogsListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    
+  final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Moje psy'),
+        title: Text(localizations!.myDogs),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -51,11 +55,11 @@ class _VolunteerDogsListScreenState extends State<VolunteerDogsListScreen> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Błąd: ${snapshot.error}'));
+            return Center(child: Text('${localizations.error}: ${snapshot.error}'));
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('Brak psów.'));
+            return Center(child: Text(localizations.noPosts));
           }
 
           final dogs = snapshot.data!.docs.map((doc) {
@@ -69,7 +73,7 @@ class _VolunteerDogsListScreenState extends State<VolunteerDogsListScreen> {
               final dog = dogs[index];
               return ListTile(
                 title: Text(dog.name),
-                subtitle: Text('Liczba zapamiętań: ${dog.numberOfSaves}'),
+                subtitle: Text('${localizations.numberOfSaves} ${dog.numberOfSaves}'),
                 leading: dog.imageUrl.isNotEmpty
                     ? Image.network(dog.imageUrl, width: 50, height: 50)
                     : const Icon(Icons.pets),

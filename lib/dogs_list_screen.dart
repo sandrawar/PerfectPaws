@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:perfect_paws/message_list_screen.dart';
@@ -13,13 +12,7 @@ import 'package:perfect_paws/sync_service.dart';
 import 'add_dog_form.dart';
 import 'dog_class.dart';
 import 'dog_card.dart';
-import 'package:flutter/foundation.dart';
-import 'volunteer_dog_list_screen.dart';
-import 'networ_status.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'settings_screen.dart';
 
 class DogsListScreen extends StatefulWidget {
   const DogsListScreen({super.key});

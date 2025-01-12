@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MessageScreen extends StatefulWidget {
   final String volunteerEmail;
@@ -35,14 +36,15 @@ class _MessageScreenState extends State<MessageScreen> {
         });
       }
     } catch (e) {
-      print('Błąd przy pobieraniu ID wolontariusza: $e');
     }
   }
 
   void _sendMessage(BuildContext context) async {
+    
+  final localizations = AppLocalizations.of(context);
     if (volunteerId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Trwa pobieranie ID wolontariusza. Spróbuj ponownie.')),
+        SnackBar(content: Text(localizations!.volunteerIdNull)),
       );
       return;
     }
@@ -58,18 +60,20 @@ class _MessageScreenState extends State<MessageScreen> {
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Wiadomość wysłana!')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(localizations!.messageSent)));
       Navigator.of(context).pop();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Błąd przy wysyłaniu wiadomości: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(localizations!.sendingMessageError)));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    
+  final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Wyślij wiadomość'),
+        title: Text(localizations!.sendMessage),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -77,13 +81,13 @@ class _MessageScreenState extends State<MessageScreen> {
           children: [
             TextField(
               controller: _messageController,
-              decoration: const InputDecoration(labelText: 'Twoja wiadomość'),
+              decoration: InputDecoration(labelText: localizations.yourMessage),
               maxLines: 5,
             ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => _sendMessage(context),
-              child: const Text('Wyślij'),
+              child: Text(localizations!.send),
             ),
           ],
         ),

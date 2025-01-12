@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'message_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MessagesListScreen extends StatefulWidget {
   const MessagesListScreen({super.key});
@@ -20,6 +21,8 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
   }
 
   void _deleteMessage(String messageId) async {
+    
+  final localizations = AppLocalizations.of(context);
     try {
       await FirebaseFirestore.instance
           .collection('users')
@@ -28,11 +31,11 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
           .doc(messageId)
           .delete();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Wiadomość została usunięta.')),
+        SnackBar(content: Text(localizations!.messageDeleted)),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Błąd podczas usuwania wiadomości: $e')),
+        SnackBar(content: Text(localizations!.deletingMessageError)),
       );
     }
   }
@@ -48,9 +51,11 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    
+  final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Twoje wiadomości'),
+        title: Text(localizations!.yoursMessages),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -65,11 +70,11 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Błąd: ${snapshot.error}'));
+            return Center(child: Text('${localizations.error}: ${snapshot.error}'));
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('Brak wiadomości.'));
+            return Center(child: Text(localizations.noMessages));
           }
 
           final messages = snapshot.data!.docs;
@@ -83,7 +88,7 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
 
               return ListTile(
                 title: Text(messageData['message']),
-                subtitle: Text('Od: ${messageData['senderEmail']}'),
+                subtitle: Text('${localizations.from}: ${messageData['senderEmail']}'),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [

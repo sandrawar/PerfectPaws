@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,26 +15,28 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
 
   Future<void> _login() async {
+    
+  final localizations = AppLocalizations.of(context)!;
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      print('Login successful');
       context.go('/');
     } on FirebaseAuthException catch (e) {
-      print('Login failed: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Błąd logowania: ${e.message}')),
+        SnackBar(content: Text(localizations.loginError)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    
+  final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: Text(localizations.logIn),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -41,23 +44,23 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             TextField(
               controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+              decoration: InputDecoration(labelText: localizations.email),
             ),
             TextField(
               controller: _passwordController,
               obscureText: true,
-              decoration: const InputDecoration(labelText: 'Hasło'),
+              decoration: InputDecoration(labelText: localizations.password),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _login,
-              child: const Text('Zaloguj'),
+              child: Text(localizations.logIn),
             ),
             TextButton(
               onPressed: () {
                 context.go('/register');
               },
-              child: const Text('Nie masz konta? Zarejestruj się'),
+              child: Text(localizations.newUser),
             ),
           ],
         ),

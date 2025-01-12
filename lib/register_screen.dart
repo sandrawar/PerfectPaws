@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -41,7 +43,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
   } catch (e) {
     setState(() {
-      _errorMessage = 'Wystąpił błąd podczas rejestracji.';
+      
+  final localizations = AppLocalizations.of(context);
+      _errorMessage = localizations!.registerError;
     });
   } finally {
     setState(() {
@@ -61,19 +65,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> createMessagesSubCollection(User user) async {
+    
+  final localizations = AppLocalizations.of(context);
   try {
     final userDocRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
     
     final messagesSubCollection = userDocRef.collection('messages');
     
     await messagesSubCollection.add({
-      'message': 'Witaj! Twoje konto zostało utworzone.',
+      'message': localizations!.welcomeMessage,
       'timestamp': FieldValue.serverTimestamp(),
     });
 
-    print('Subkolekcja messages dla użytkownika ${user.uid} została utworzona.');
   } catch (e) {
-    print('Błąd przy tworzeniu subkolekcji messages: $e');
   }
 }
 
@@ -81,9 +85,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    
+  final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Rejestracja'),
+        title: Text(localizations!.registerYourself),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -94,18 +100,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
             children: [
               TextField(
                 controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: localizations!.email,
+                  border: const OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _passwordController,
-                decoration: const InputDecoration(
-                  labelText: 'Hasło',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: localizations.password,
+                  border: const OutlineInputBorder(),
                 ),
                 obscureText: true,
               ),
@@ -129,7 +135,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               else
                 ElevatedButton(
                   onPressed: _register, 
-                  child: const Text('Zarejestruj się'),
+                  child: Text(localizations.registerYourself),
                 ),
               if (_errorMessage != null)
                 Padding(
@@ -143,7 +149,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 onPressed: () {
                   context.go('/login');
                 },
-                child: const Text('Masz już konto? Zaloguj się'),
+                child: Text(localizations.registeredAlready),
               ),
             ],
           ),

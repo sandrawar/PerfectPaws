@@ -30,7 +30,6 @@ class SyncService {
             }
             _syncActionBox.delete(key); 
           } catch (e) {
-            print('Błąd przy synchronizacji: $e');
           }
         }
       }
@@ -70,7 +69,6 @@ class SyncService {
 
     final dogSnapshot = await dogRef.get();
     if (!dogSnapshot.exists) {
-      print('Błąd: Pies o ID $dogId nie istnieje w Firebase');
       return;
     }
 
@@ -82,7 +80,6 @@ class SyncService {
 
     final savedDogSnapshot = await savedDogRef.get();
     if (!savedDogSnapshot.exists) {
-      print('Błąd: Pies o ID $dogId nie jest zapisany w Firebase');
       return;
     }
 
@@ -94,9 +91,7 @@ class SyncService {
     });
 
 
-    print('Pies o ID $dogId został pomyślnie usunięty z zapisanych psów. (index: $index)');
   } catch (e) {
-    print('Błąd przy usuwaniu psa: $e');
   }
 }
 
