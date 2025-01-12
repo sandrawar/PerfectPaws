@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:perfect_paws/dog_class.dart';
+import 'package:perfect_paws/dogs_list_logic/dog_class.dart';
 import 'package:go_router/go_router.dart'; 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart'; 
 

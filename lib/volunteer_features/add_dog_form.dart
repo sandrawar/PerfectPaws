@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:camera/camera.dart';
 import 'dart:io';  
-import 'dog_class.dart';
+import '../dogs_list_logic/dog_class.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';  
 

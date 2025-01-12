@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:perfect_paws/message_screen.dart';
+import 'package:perfect_paws/messages/message_screen.dart';
 import 'dog_class.dart';
 
 class DogCard extends StatelessWidget {

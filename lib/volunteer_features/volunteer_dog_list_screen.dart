@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'dog_class.dart';
+import '../dogs_list_logic/dog_class.dart';
 import 'add_dog_form.dart';
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';

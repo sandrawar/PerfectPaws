@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:perfect_paws/dog_class.dart';
-import 'package:perfect_paws/networ_status.dart';
-import 'package:perfect_paws/sync_act.dart';
+import 'package:perfect_paws/dogs_list_logic/dog_class.dart';
+import 'package:perfect_paws/offline_data_sync/networ_status.dart';
+import 'package:perfect_paws/offline_data_sync/sync_act.dart';
 
 class SyncService {
   final Box<SyncAction> _syncActionBox;

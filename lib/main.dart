@@ -4,23 +4,23 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:perfect_paws/dog_class.dart';
-import 'package:perfect_paws/dog_details_screen.dart';
-import 'package:perfect_paws/firebase_options.dart';
-import 'package:perfect_paws/networ_status.dart';
-import 'package:perfect_paws/sync_act.dart';
-import 'package:perfect_paws/sync_service.dart';
-import 'package:perfect_paws/volunteer_dog_list_screen.dart';
+import 'package:perfect_paws/dogs_list_logic/dog_class.dart';
+import 'package:perfect_paws/dogs_list_logic/dog_details_screen.dart';
+import 'package:perfect_paws/auth/firebase_options.dart';
+import 'package:perfect_paws/offline_data_sync/networ_status.dart';
+import 'package:perfect_paws/offline_data_sync/sync_act.dart';
+import 'package:perfect_paws/offline_data_sync/sync_service.dart';
+import 'package:perfect_paws/volunteer_features/volunteer_dog_list_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-import 'dogs_list_screen.dart'; 
-import 'login_screen.dart'; 
-import 'register_screen.dart'; 
+import 'dogs_list_logic/dogs_list_screen.dart'; 
+import 'auth/login_screen.dart'; 
+import 'auth/register_screen.dart'; 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'locale_provider.dart';
-import 'settings_screen.dart';
+import 'language/locale_provider.dart';
+import 'language/settings_screen.dart';
 
 
 Future<void> main() async {
