@@ -10,6 +10,7 @@ import 'package:perfect_paws/offline_data_sync/networ_status.dart';
 import 'package:perfect_paws/language/settings_screen.dart';
 import 'package:perfect_paws/offline_data_sync/sync_act.dart';
 import 'package:perfect_paws/offline_data_sync/sync_service.dart';
+import 'package:perfect_paws/volunteer_features/item_fader.dart';
 import '../volunteer_features/add_dog_form.dart';
 import 'dog_class.dart';
 import 'dog_card.dart';
@@ -407,65 +408,63 @@ void _showSaveAnimation(BuildContext conext) {
 }
 
 
-  void _showDogDetails(Dog dog) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        dog.name,
-                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  if (dog.imageUrl.isNotEmpty)
-                    Image.network(
-                      dog.imageUrl,
-                      height: 200,
-                      fit: BoxFit.cover,
+void _showDogDetails(Dog dog) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return Scaffold(
+            body: myPage(
+              elements: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      dog.name,
+                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Imię: ${dog.name}',
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                  Text(
-                    'Wiek: ${dog.age}',
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Opis: ${dog.description}',
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Lokalizacja: ${dog.location}',
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
+                    IconButton(
+                      alignment: Alignment.topRight,
+                      icon: const Icon(Icons.close, color: Colors.white,),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),]
+                ),
+                const SizedBox(height: 16),
+                if (dog.imageUrl.isNotEmpty)
+                  ClipOval(
+                    child:
+                  Image.network(
+                    dog.imageUrl,
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.cover,
+                  )),
+                const SizedBox(height: 20),
+                
+                const SizedBox(height: 16),
+                Text(
+                  'Wiek: ${dog.age}',
+                  style: const TextStyle(fontSize: 18, color: Colors.white),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Opis: ${dog.description}',
+                  style: const TextStyle(fontSize: 18, color: Colors.white),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Lokalizacja: ${dog.location}',
+                  style: const TextStyle(fontSize: 18, color: Colors.white),
+                ),
+              const SizedBox(height: 16),
+              ],
+              onNext: () {
+                Navigator.of(context).pop(); // Close the dialog if needed
+              },
             ),
-          ),
-        );
-      },
-    );
-  }
+      );
+    },
+  );
+}
 }

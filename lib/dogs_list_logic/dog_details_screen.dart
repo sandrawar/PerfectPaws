@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:perfect_paws/dogs_list_logic/dog_class.dart';
 import 'package:go_router/go_router.dart'; 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; 
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:perfect_paws/volunteer_features/item_fader.dart'; 
 
 class DogDetailsScreen extends StatefulWidget {
   final Dog dog;
@@ -82,43 +83,49 @@ class _DogDetailsScreenState extends State<DogDetailsScreen> {
       ),
       
     backgroundColor: Color.fromRGBO(197, 174, 174, 2),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      body: myPage(
+        elements: [
             if (widget.dog.imageUrl.isNotEmpty)
-              Image.network(widget.dog.imageUrl, height: 200, fit: BoxFit.cover),
+              ClipOval(child: Image.network(widget.dog.imageUrl, height: 200, width: 200, fit: BoxFit.cover)),
             const SizedBox(height: 16),
             TextField(
               controller: _nameController,
-              decoration: InputDecoration(labelText: localizations!.dogsName),
+              decoration: InputDecoration(labelText: localizations!.dogsName, 
+              labelStyle: TextStyle(color: Colors.white),
+              //hintText: localizations!.enterDogName,    // Hint text
+            hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)), // Hint text color
+    ),
+    style: TextStyle(color: Colors.white),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _ageController,
-              decoration: InputDecoration(labelText: localizations.dogsAge),
+              decoration: InputDecoration(labelText: localizations.dogsAge, labelStyle: TextStyle(color: Colors.white),),
               keyboardType: TextInputType.number,
+    style: TextStyle(color: Colors.white),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _descriptionController,
-              decoration: InputDecoration(labelText: localizations.dogsDescription),
+              decoration: InputDecoration(labelText: localizations.dogsDescription, labelStyle: TextStyle(color: Colors.white),),
               maxLines: 3,
+    style: TextStyle(color: Colors.white),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _locationController,
-              decoration: InputDecoration(labelText: localizations.dogsLocation),
+              decoration: InputDecoration(labelText: localizations.dogsLocation, labelStyle: TextStyle(color: Colors.white),),
+    style: TextStyle(color: Colors.white),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _updateDogData,
-              child: Text(localizations.saveChanges),
+              child: Text(localizations.saveChanges,
+    style: TextStyle(color: Colors.white),),
             ),
           ],
+          onNext:  _updateDogData,
         ),
-      ),
-    );
+      );
   }
 }

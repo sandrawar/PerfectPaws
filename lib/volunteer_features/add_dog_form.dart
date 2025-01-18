@@ -102,93 +102,21 @@ class _AddDogFormState extends State<AddDogForm> {
   final localizations = AppLocalizations.of(context);
     return AlertDialog(
       title: Text(localizations!.addDog),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (_currentStep == 0) ...[
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(labelText: localizations.dogsName),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return localizations.dogsNameNullCheck;
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: InputDecoration(labelText: localizations.dogsDescription),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return localizations.dogsDescriptionNullCheck;
-                  }
-                  return null;
-                },
-              ),
-            ] else if (_currentStep == 1) ...[
-              if (_isCameraInitialized)
-                SizedBox(
-                  height: 300,
-                  width: double.infinity,
-                  child: CameraPreview(_controller!),  
-                ),
-              ElevatedButton(
-                onPressed: _takePicture,
-                child: Text(localizations.takePicture),
-              ),
-              ElevatedButton(
-                onPressed: _pickImageFromGallery,
-                child: Text(localizations.choosePicture),
-              ),
-              if (_image != null) ...[
-                Image.file(
-                  File(_image!.path),
-                  height: 150,
-                  width: 150,
-                  fit: BoxFit.cover,
-                ),
-                const SizedBox(height: 10),
-              ],
-              TextFormField(
-                controller: _locationController,
-                decoration: InputDecoration(labelText: localizations.dogsLocation),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return localizations.dogsLocationNullCheck;
-                  }
-                  return null;
-                },
-              ),
-            ] else if (_currentStep == 2) ...[
-              TextFormField(
-                controller: _ageController,
-                decoration: InputDecoration(labelText: localizations.dogsAge),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return localizations.dogsAgeNullCheck;
-                  }
-                  return null;
-                },
-                keyboardType: TextInputType.number,
-              ),
-              TextFormField(
-                controller: _volunteerController,
-                decoration: InputDecoration(labelText: localizations.volunteer),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return localizations.volunteerNullCheck;
-                  }
-                  return null;
-                },
-                enabled: false,
-              ),
-            ],
-          ],
-        ),
-      ),
+      content: 
+      Form(
+  key: _formKey,
+  child: AnimatedSwitcher(
+    duration: const Duration(milliseconds: 300),
+    transitionBuilder: (child, animation) {
+      return FadeTransition(
+        opacity: animation,
+        child: child,
+      );
+    },
+    child: _buildStepContent(_currentStep, localizations),
+  ),
+),
+
       actions: [
         if (_currentStep > 0)
           TextButton(
@@ -214,6 +142,116 @@ class _AddDogFormState extends State<AddDogForm> {
       ],
     );
   }
+
+  Widget _buildStepContent(int step, AppLocalizations localizations) {
+  switch (step) {
+    case 0:
+      return Column(
+        key: const ValueKey(0), // Klucz dla kroku 0
+        children: [
+          TextFormField(
+            controller: _nameController,
+            decoration: InputDecoration(labelText: localizations.dogsName),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return localizations.dogsNameNullCheck;
+              }
+              return null;
+            },
+          ),
+          TextFormField(
+            controller: _descriptionController,
+            decoration: InputDecoration(labelText: localizations.dogsDescription),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return localizations.dogsDescriptionNullCheck;
+              }
+              return null;
+            },
+          ),
+          TextFormField(
+            controller: _locationController,
+            decoration: InputDecoration(labelText: localizations.dogsLocation),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return localizations.dogsLocationNullCheck;
+              }
+              return null;
+            },
+          ),
+        ],
+      );
+    case 1:
+      return Column(
+        key: const ValueKey(1), // Klucz dla kroku 1
+        children: [
+          if (_isCameraInitialized && _image == null) ...[
+            SizedBox(
+              height: 300,
+              width: double.infinity,
+              child: CameraPreview(_controller!),
+            ),
+            ElevatedButton(
+              onPressed: _takePicture,
+              child: Text(localizations.takePicture),
+            ),
+            ElevatedButton(
+              onPressed: _pickImageFromGallery,
+              child: Text(localizations.choosePicture),
+            ),
+          ],
+          if (_image != null) ...[
+            Image.file(
+              File(_image!.path),
+              height: 150,
+              width: 150,
+              fit: BoxFit.cover,
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _image = null;
+                });
+              },
+              child: Text(localizations.takePicture),
+            ),
+          ],
+        ],
+      );
+    case 2:
+      return Column(
+        key: const ValueKey(2), // Klucz dla kroku 2
+        children: [
+          TextFormField(
+            controller: _ageController,
+            decoration: InputDecoration(labelText: localizations.dogsAge),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return localizations.dogsAgeNullCheck;
+              }
+              return null;
+            },
+            keyboardType: TextInputType.number,
+          ),
+          TextFormField(
+            controller: _volunteerController,
+            decoration: InputDecoration(labelText: localizations.volunteer),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return localizations.volunteerNullCheck;
+              }
+              return null;
+            },
+            enabled: false,
+          ),
+        ],
+      );
+    default:
+      return const SizedBox.shrink();
+  }
+}
+
 
   void _nextStep() {
     if (_formKey.currentState!.validate()) {
