@@ -80,6 +80,8 @@ class _DogDetailsScreenState extends State<DogDetailsScreen> {
           },
         ),
       ),
+      
+    backgroundColor: Color.fromRGBO(197, 174, 174, 2),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

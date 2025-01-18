@@ -12,10 +12,18 @@ class DogCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Color.fromRGBO(197, 174, 174, 1),
       child: ListTile(
-        leading: Image.network(dog.imageUrl),
-        title: Text(dog.name),
-        subtitle: Text('${dog.age} years old'),
+        //tileColor: Color.fromRGBO(197, 174, 174, 10),
+        leading: ClipOval(
+          child: Image.network(dog.imageUrl,
+    width: 50.0, // Szerokość obrazu
+    height: 50.0, // Wysokość obrazu
+    fit: BoxFit.cover,)),
+        title: Text(dog.name, 
+    style: TextStyle(color: Colors.white),),
+        subtitle: Text('${dog.age} years old', 
+    style: TextStyle(color: Colors.white),),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -27,7 +35,7 @@ class DogCard extends StatelessWidget {
               onPressed: onFavoriteToggle,
             ),
             IconButton(
-              icon: const Icon(Icons.message),
+              icon: const Icon(Icons.message, color: Colors.white,),
               onPressed: () {
                 Navigator.push(
                   context,

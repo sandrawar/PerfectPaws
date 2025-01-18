@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:perfect_paws/menu_screen.dart';
 import 'message_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../menu_screen.dart';
+import '../language/settings_screen.dart';
 
 class MessagesListScreen extends StatefulWidget {
   const MessagesListScreen({super.key});
@@ -11,14 +14,27 @@ class MessagesListScreen extends StatefulWidget {
   _MessagesListScreenState createState() => _MessagesListScreenState();
 }
 
-class _MessagesListScreenState extends State<MessagesListScreen> {
+class _MessagesListScreenState extends State<MessagesListScreen> 
+with SingleTickerProviderStateMixin{
+
+  
+  late AnimationController animationController;
   late String userId;
 
   @override
   void initState() {
     super.initState();
     userId = FirebaseAuth.instance.currentUser!.uid;
+    animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 250),
+    );
   }
+  void toggle() => animationController.isDismissed
+  ? animationController.forward()
+  : animationController.reverse();
+
+  final double maxSlide = 225.0;
 
   void _deleteMessage(String messageId) async {
     
@@ -53,10 +69,21 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
   Widget build(BuildContext context) {
     
   final localizations = AppLocalizations.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(localizations!.yoursMessages),
+  var myDrawer = MenuScreen();
+    var myChild = Scaffold(
+      appBar: AppBar(       
+    backgroundColor: Color.fromRGBO(197, 174, 174, 1),
+        leading:
+          IconButton(
+            alignment: Alignment.topLeft,
+        icon: Icon( Icons.menu, color: Colors.white,),
+        onPressed: () {
+          toggle();
+        },),
+        title: Text(localizations!.yoursMessages, 
+    style: TextStyle(color: Colors.white),),
       ),
+  backgroundColor: Color.fromRGBO(188, 104, 104, 1),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('users')
@@ -70,11 +97,13 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('${localizations.error}: ${snapshot.error}'));
+            return Center(child: Text('${localizations.error}: ${snapshot.error}', 
+    style: TextStyle(color: Colors.white),));
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text(localizations.noMessages));
+            return Center(child: Text(localizations.noMessages, 
+    style: TextStyle(color: Colors.white),));
           }
 
           final messages = snapshot.data!.docs;
@@ -87,8 +116,10 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
               final messageId = message.id;
 
               return ListTile(
-                title: Text(messageData['message']),
-                subtitle: Text('${localizations.from}: ${messageData['senderEmail']}'),
+                title: Text(messageData['message'], 
+    style: TextStyle(color: Colors.white),),
+                subtitle: Text('${localizations.from}: ${messageData['senderEmail']}', 
+    style: TextStyle(color: Colors.white),),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -109,6 +140,27 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
           );
         },
       ),
+    );
+    return GestureDetector(
+      onTap: toggle,
+      child: AnimatedBuilder(
+    animation: animationController,
+    builder: (context, _){
+      double slide = maxSlide*animationController.value;
+      double scale = 1 - (animationController.value * 0.3);
+    return Stack(
+      children: <Widget>[
+        myDrawer,
+        Transform(
+          transform: Matrix4.identity()
+          ..translate(slide)
+          ..scale(scale),
+          alignment: Alignment.centerLeft,
+          child: myChild,)
+      ],
+    );
+  }
+  )
     );
   }
 }

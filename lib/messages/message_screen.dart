@@ -73,8 +73,13 @@ class _MessageScreenState extends State<MessageScreen> {
   final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(localizations!.sendMessage),
+        
+    backgroundColor: Color.fromRGBO(197, 174, 174, 1),
+        title: Text(localizations!.sendMessage, 
+    style: TextStyle(color: Colors.white),),
       ),
+      
+  backgroundColor: Color.fromRGBO(188, 104, 104, 1),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lottie/lottie.dart';
+import 'package:perfect_paws/menu_screen.dart';
 import 'package:perfect_paws/messages/message_list_screen.dart';
 import 'package:perfect_paws/offline_data_sync/networ_status.dart';
 import 'package:perfect_paws/language/settings_screen.dart';
@@ -21,7 +22,10 @@ class DogsListScreen extends StatefulWidget {
   _DogsListScreenState createState() => _DogsListScreenState();
 }
 
-class _DogsListScreenState extends State<DogsListScreen> {
+class _DogsListScreenState extends State<DogsListScreen> 
+with SingleTickerProviderStateMixin{
+  
+  late AnimationController animationController;
   late User _currentUser;
   late CollectionReference _savedDogsCollection;
 
@@ -52,18 +56,38 @@ class _DogsListScreenState extends State<DogsListScreen> {
 
     _openBox();
     _initializeSyncService();
+    animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 250),
+    );
   }
+  void toggle() => animationController.isDismissed
+  ? animationController.forward()
+  : animationController.reverse();
+
+  final double maxSlide = 225.0;
 
   @override
   Widget build(BuildContext context) {
 
   final localizations = AppLocalizations.of(context);
-  return Scaffold(
+  var myChild = Scaffold(
   appBar: AppBar(
-  title: Text(localizations!.dogs),
+    backgroundColor: Color.fromRGBO(197, 174, 174, 1),
+        automaticallyImplyLeading: false,
+        leading:
+          IconButton(
+            alignment: Alignment.topLeft,
+        icon: Icon( Icons.menu, color: Colors.white,),
+        onPressed: () {
+          toggle();
+        },
+      ),
+    title: Text(localizations!.dogs, 
+    style: TextStyle(color: Colors.white),),
     actions: [
       IconButton(
-        icon: Icon(_showOnlySaved ? Icons.list : Icons.star),
+        icon: Icon(_showOnlySaved ? Icons.list : Icons.star, color: Colors.white,),
         onPressed: () {
           setState(() {
             _showOnlySaved = !_showOnlySaved;
@@ -73,6 +97,7 @@ class _DogsListScreenState extends State<DogsListScreen> {
       IconButton(
         icon: Icon(
           _isSortedBySaves ? Icons.sort_by_alpha : Icons.sort,
+          color: Colors.white,
         ),
         onPressed: () {
           setState(() {
@@ -80,28 +105,7 @@ class _DogsListScreenState extends State<DogsListScreen> {
           });
         },
       ),
-      IconButton(
-        icon: const Icon(Icons.message),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const MessagesListScreen(),
-            ),
-          );
-        },
-      ),
-      IconButton(
-        icon: const Icon(Icons.settings),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const SettingsScreen(),
-            ),
-          );
-        },
-      ),
+      
       FutureBuilder<bool>(
         future: _isUserVolunteer(),
         builder: (context, snapshot) {
@@ -111,7 +115,7 @@ class _DogsListScreenState extends State<DogsListScreen> {
 
           if (snapshot.data == true) {
             return IconButton(
-              icon: const Icon(Icons.pets),
+              icon: const Icon(Icons.pets, color: Colors.white,),
               onPressed: () {
                 context.go('/volunteer-dogs');
               },
@@ -121,12 +125,9 @@ class _DogsListScreenState extends State<DogsListScreen> {
           }
         },
       ),
-      IconButton(
-        icon: const Icon(Icons.exit_to_app),
-        onPressed: _logout,
-      ),
-    ],
+     ],
   ),
+  backgroundColor: Color.fromRGBO(188, 104, 104, 1),
   body: FutureBuilder<void>(
     future: Future.wait([_openBox(), _initializeSyncService()]),
     builder: (context, snapshot) {
@@ -248,6 +249,28 @@ class _DogsListScreenState extends State<DogsListScreen> {
     },
   ),
 );
+var myDrawer = MenuScreen();
+     return GestureDetector(
+      onTap: toggle,
+      child: AnimatedBuilder(
+    animation: animationController,
+    builder: (context, _){
+      double slide = maxSlide*animationController.value;
+      double scale = 1 - (animationController.value * 0.3);
+    return Stack(
+      children: <Widget>[
+        myDrawer,
+        Transform(
+          transform: Matrix4.identity()
+          ..translate(slide)
+          ..scale(scale),
+          alignment: Alignment.centerLeft,
+          child: myChild,)
+      ],
+    );
+  }
+  )
+    );
   }
 
   Widget _buildDogList(List<Dog> dogs) {

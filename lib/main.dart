@@ -132,7 +132,7 @@ final GoRouter _router = GoRouter(
     ),GoRoute(
       path: '/settings',
       name: 'settings',
-      builder: (context, state) => const SettingsScreen(),
+      builder: (context, state) => SettingsScreen(),
     ),
     GoRoute(
       path: '/dog-details/:id',
