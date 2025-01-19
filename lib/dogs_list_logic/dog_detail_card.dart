@@ -9,14 +9,17 @@ abstract class DogDetailsCard {
       context: context,
       builder: (context) {
         return Scaffold(
-          body: myPage(
+          body: MyPage(
             elements: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
                     dog.name,
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
                   IconButton(
                     alignment: Alignment.topRight,
@@ -56,8 +59,8 @@ abstract class DogDetailsCard {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
-                  onFavoriteToggle(dog);  // Zapisuje psa
-                  Navigator.of(context).pop();  // Zamykamy dialog
+                  onFavoriteToggle(dog); // Zapisuje psa
+                  Navigator.of(context).pop(); // Zamykamy dialog
                 },
                 child: Text(dog.isSaved ? 'Usuń z zapisanych' : 'Zapisz psa'),
               ),

@@ -12,14 +12,11 @@ class VolunteerDogsListScreen extends StatefulWidget {
   const VolunteerDogsListScreen({super.key});
 
   @override
-  _VolunteerDogsListScreenState createState() =>
-      _VolunteerDogsListScreenState();
+  VolunteerDogsListScreenState createState() => VolunteerDogsListScreenState();
 }
 
-class _VolunteerDogsListScreenState extends State<VolunteerDogsListScreen> 
-with SingleTickerProviderStateMixin{
-
-  
+class VolunteerDogsListScreenState extends State<VolunteerDogsListScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController animationController;
   late User _currentUser;
   late Stream<QuerySnapshot> _dogsStream;
@@ -36,8 +33,8 @@ with SingleTickerProviderStateMixin{
   }
 
   void toggle() => animationController.isDismissed
-  ? animationController.forward()
-  : animationController.reverse();
+      ? animationController.forward()
+      : animationController.reverse();
 
   final double maxSlide = 225.0;
 
@@ -50,24 +47,27 @@ with SingleTickerProviderStateMixin{
 
   @override
   Widget build(BuildContext context) {
-    
-  final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context);
     var myChild = Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(197, 174, 174, 1),
         automaticallyImplyLeading: false,
-        leading:
-          IconButton(
-            alignment: Alignment.topLeft,
-        icon: const Icon( Icons.menu, color: Colors.white,),
-        onPressed: () {
-          toggle();
-        },
+        leading: IconButton(
+          alignment: Alignment.topLeft,
+          icon: const Icon(
+            Icons.menu,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            toggle();
+          },
+        ),
+        title: Text(
+          localizations!.myDogs,
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
-        title: Text(localizations!.myDogs, 
-    style: const TextStyle(color: Colors.white),),
-      ),
-  backgroundColor: const Color.fromRGBO(188, 104, 104, 1),
+      backgroundColor: const Color.fromRGBO(188, 104, 104, 1),
       body: StreamBuilder<QuerySnapshot>(
         stream: _dogsStream,
         builder: (context, snapshot) {
@@ -76,7 +76,8 @@ with SingleTickerProviderStateMixin{
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('${localizations.error}: ${snapshot.error}'));
+            return Center(
+                child: Text('${localizations.error}: ${snapshot.error}'));
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -95,27 +96,32 @@ with SingleTickerProviderStateMixin{
               return Padding(
                 padding: const EdgeInsetsDirectional.all(16),
                 child: Card(
-      color: const Color.fromRGBO(197, 174, 174, 1),
-      child: ListTile(
-        leading: ClipOval(
-          child: Image.network(dog.imageUrl,
-    width: 50.0, 
-    height: 50.0, 
-    fit: BoxFit.cover,)),
-                title: Text(dog.name, 
-    style: const TextStyle(color: Colors.white),),
-                subtitle: Text('${localizations.numberOfSaves}: ${dog.numberOfSaves}', 
-    style: const TextStyle(color: Colors.white),),
-                onTap: () {
-                  context.go(
-                    '/dog-details/${dog.id}',
-                    extra: dog,
-                  );
-                },
-
-      ),
-    ),); 
-  
+                  color: const Color.fromRGBO(197, 174, 174, 1),
+                  child: ListTile(
+                    leading: ClipOval(
+                        child: Image.network(
+                      dog.imageUrl,
+                      width: 50.0,
+                      height: 50.0,
+                      fit: BoxFit.cover,
+                    )),
+                    title: Text(
+                      dog.name,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    subtitle: Text(
+                      '${localizations.numberOfSaves}: ${dog.numberOfSaves}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    onTap: () {
+                      context.go(
+                        '/dog-details/${dog.id}',
+                        extra: dog,
+                      );
+                    },
+                  ),
+                ),
+              );
             },
           );
         },
@@ -132,7 +138,7 @@ with SingleTickerProviderStateMixin{
         child: const Icon(Icons.add),
       ),
     );
-     return MenuScreen.animatedMenu(myChild, MenuScreen(), maxSlide, toggle, animationController);
+    return MenuScreen.animatedMenu(
+        myChild, MenuScreen(), maxSlide, toggle, animationController);
   }
-  }
-
+}

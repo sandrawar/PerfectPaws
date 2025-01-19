@@ -4,19 +4,19 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:camera/camera.dart';
 import 'package:intl/intl.dart';
-import 'dart:io';  
+import 'dart:io';
 import '../dogs_list_logic/dog_class.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';  
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AddDogForm extends StatefulWidget {
   const AddDogForm({super.key});
 
   @override
-  _AddDogFormState createState() => _AddDogFormState();
+  AddDogFormState createState() => AddDogFormState();
 }
 
-class _AddDogFormState extends State<AddDogForm> {
+class AddDogFormState extends State<AddDogForm> {
   final _nameController = TextEditingController();
   final _imageController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -67,19 +67,32 @@ class _AddDogFormState extends State<AddDogForm> {
         _image = photo;
         _imageController.text = photo.path;
       });
-    } catch (e) {}
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Error")),
+        );
+      }
+    }
   }
 
   Future<void> _pickImageFromGallery() async {
     try {
-      final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      final XFile? pickedFile =
+          await _picker.pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
         setState(() {
           _image = pickedFile;
           _imageController.text = pickedFile.path;
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Error")),
+        );
+      }
+    }
   }
 
   Future<String> _uploadImageToFirebase(XFile image) async {
@@ -143,8 +156,8 @@ class _AddDogFormState extends State<AddDogForm> {
   }
 
   Widget _buildStepContent(int step, AppLocalizations localizations) {
-
-final formattedDate = DateFormat.yMMMMd(localizations.localeName).format(DateTime.now());
+    final formattedDate =
+        DateFormat.yMMMMd(localizations.localeName).format(DateTime.now());
     switch (step) {
       case 0:
         return Column(
@@ -162,7 +175,8 @@ final formattedDate = DateFormat.yMMMMd(localizations.localeName).format(DateTim
             ),
             TextFormField(
               controller: _descriptionController,
-              decoration: InputDecoration(labelText: localizations.dogsDescription),
+              decoration:
+                  InputDecoration(labelText: localizations.dogsDescription),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return localizations.dogsDescriptionNullCheck;
@@ -172,7 +186,8 @@ final formattedDate = DateFormat.yMMMMd(localizations.localeName).format(DateTim
             ),
             TextFormField(
               controller: _locationController,
-              decoration: InputDecoration(labelText: localizations.dogsLocation),
+              decoration:
+                  InputDecoration(labelText: localizations.dogsLocation),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return localizations.dogsLocationNullCheck;
@@ -312,14 +327,20 @@ final formattedDate = DateFormat.yMMMMd(localizations.localeName).format(DateTim
 
       try {
         await FirebaseFirestore.instance.collection('dogs').add(dog.toMap());
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(localizations!.dogAdded)),
-        );
-        Navigator.of(context).pop(true);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(localizations!.dogAdded)),
+          );
+        }
+        if (mounted) {
+          Navigator.of(context).pop(true);
+        }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Błąd: $e')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Błąd: $e')),
+          );
+        }
       }
     }
   }

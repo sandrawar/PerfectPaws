@@ -9,10 +9,10 @@ class MessageScreen extends StatefulWidget {
   const MessageScreen({super.key, required this.volunteerEmail});
 
   @override
-  _MessageScreenState createState() => _MessageScreenState();
+  MessageScreenState createState() => MessageScreenState();
 }
 
-class _MessageScreenState extends State<MessageScreen> {
+class MessageScreenState extends State<MessageScreen> {
   final TextEditingController _messageController = TextEditingController();
   String? volunteerId;
 
@@ -36,12 +36,15 @@ class _MessageScreenState extends State<MessageScreen> {
         });
       }
     } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("Error")));
+      }
     }
   }
 
-  void _sendMessage(BuildContext context) async {
-    
-  final localizations = AppLocalizations.of(context);
+  void sendMessage(BuildContext context) async {
+    final localizations = AppLocalizations.of(context);
     if (volunteerId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(localizations!.volunteerIdNull)),
@@ -51,35 +54,45 @@ class _MessageScreenState extends State<MessageScreen> {
 
     try {
       await FirebaseFirestore.instance
-          .collection('users') 
-          .doc(volunteerId) 
-          .collection('messages') 
+          .collection('users')
+          .doc(volunteerId)
+          .collection('messages')
           .add({
         'senderEmail': FirebaseAuth.instance.currentUser!.email,
         'message': _messageController.text,
         'timestamp': FieldValue.serverTimestamp(),
       });
-
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(localizations!.messageSent)));
-      Navigator.of(context).pop();
+      if (mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(localizations!.messageSent)),
+          );
+          Navigator.of(context).pop();
+        });
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(localizations!.sendingMessageError)));
+      if (mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(localizations!.sendingMessageError)),
+          );
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    
-  final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        
-    backgroundColor: Color.fromRGBO(197, 174, 174, 1),
-        title: Text(localizations!.sendMessage, 
-    style: TextStyle(color: Colors.white),),
+        backgroundColor: const Color.fromRGBO(197, 174, 174, 1),
+        title: Text(
+          localizations!.sendMessage,
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
-      
-  backgroundColor: Color.fromRGBO(188, 104, 104, 1),
+      backgroundColor: const Color.fromRGBO(188, 104, 104, 1),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -91,8 +104,8 @@ class _MessageScreenState extends State<MessageScreen> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () => _sendMessage(context),
-              child: Text(localizations!.send),
+              onPressed: () => sendMessage(context),
+              child: Text(localizations.send),
             ),
           ],
         ),

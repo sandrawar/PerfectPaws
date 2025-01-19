@@ -16,9 +16,12 @@ class MenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(188, 104, 104, 1),
+        backgroundColor: const Color.fromRGBO(188, 104, 104, 1),
         automaticallyImplyLeading: false,
-        title: const Text("Menu", style: TextStyle(color: Colors.white),),
+        title: const Text(
+          "Menu",
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       backgroundColor: const Color.fromARGB(228, 201, 153, 153),
       body: ListView(
@@ -29,7 +32,7 @@ class MenuScreen extends StatelessWidget {
             text: "Home",
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => DogsListScreen()),
+              MaterialPageRoute(builder: (context) => const DogsListScreen()),
             ),
           ),
           _buildMenuItem(
@@ -38,7 +41,8 @@ class MenuScreen extends StatelessWidget {
             text: "Messages",
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const MessagesListScreen()),
+              MaterialPageRoute(
+                  builder: (context) => const MessagesListScreen()),
             ),
           ),
           _buildMenuItem(
@@ -47,7 +51,7 @@ class MenuScreen extends StatelessWidget {
             text: "Settings",
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => SettingsScreen()),
+              MaterialPageRoute(builder: (context) => const SettingsScreen()),
             ),
           ),
           FutureBuilder<bool>(
@@ -62,9 +66,10 @@ class MenuScreen extends StatelessWidget {
                   icon: Icons.pets,
                   text: "My Posters",
                   onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => VolunteerDogsListScreen()),
-            ),
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const VolunteerDogsListScreen()),
+                  ),
                 );
               }
               return const SizedBox.shrink();
@@ -81,32 +86,34 @@ class MenuScreen extends StatelessWidget {
     );
   }
 
-  static Widget animatedMenu(Widget myChild, Widget myDrawer, double maxSlide, VoidCallback toggle, AnimationController animationController){
-   return GestureDetector(
-      onTap: toggle,
-      child: AnimatedBuilder(
-    animation: animationController,
-    builder: (context, _){
-      double slide = maxSlide*animationController.value;
-      double scale = 1 - (animationController.value * 0.3);
-    return Stack(
-      children: <Widget>[
-        myDrawer,
-        Transform(
-          transform: Matrix4.identity()
-          ..translate(slide)
-          ..scale(scale),
-          alignment: Alignment.centerLeft,
-          child: myChild,)
-      ],
-    );
-  }
-  )
-    );
+  static Widget animatedMenu(Widget myChild, Widget myDrawer, double maxSlide,
+      VoidCallback toggle, AnimationController animationController) {
+    return GestureDetector(
+        onTap: toggle,
+        child: AnimatedBuilder(
+            animation: animationController,
+            builder: (context, _) {
+              double slide = maxSlide * animationController.value;
+              double scale = 1 - (animationController.value * 0.3);
+              return Stack(
+                children: <Widget>[
+                  myDrawer,
+                  Transform(
+                    transform: Matrix4.identity()
+                      ..translate(slide)
+                      ..scale(scale),
+                    alignment: Alignment.centerLeft,
+                    child: myChild,
+                  )
+                ],
+              );
+            }));
   }
 
   Widget _buildMenuItem(BuildContext context,
-      {required IconData icon, required String text, required VoidCallback onTap}) {
+      {required IconData icon,
+      required String text,
+      required VoidCallback onTap}) {
     return ListTile(
       leading: Icon(icon, color: Colors.white),
       title: Text(text, style: const TextStyle(color: Colors.white)),
@@ -127,11 +134,15 @@ class MenuScreen extends StatelessWidget {
   void _logout(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signOut();
-      context.go('/login');
+      if (context.mounted) {
+        context.go('/login');
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error while logging out: $e")),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error while logging out: $e")),
+        );
+      }
     }
   }
 }

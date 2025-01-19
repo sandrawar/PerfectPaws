@@ -26,7 +26,7 @@ class DogAdapter extends TypeAdapter<Dog> {
     String? volunteer = fields[9] as String?;
 
     // Jeśli wartości są null, ustawiamy domyślne wartości
-    id ??= ''; 
+    id ??= '';
     name ??= '';
     description ??= '';
     imageUrl ??= '';

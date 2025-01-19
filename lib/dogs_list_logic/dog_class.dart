@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
-part 'dog_class.g.dart'; 
+part 'dog_class.g.dart';
 
 @HiveType(typeId: 0)
 class Dog {
@@ -43,8 +43,8 @@ class Dog {
     required this.isEstimatedBirthDate,
     this.numberOfSaves = 0,
     required this.volunteer,
-    this.description = '', 
-    this.location = '', 
+    this.description = '',
+    this.location = '',
   });
 
   Map<String, dynamic> toMap() {
@@ -52,12 +52,12 @@ class Dog {
       'name': name,
       'imageUrl': imageUrl,
       'isSaved': isSaved,
-      'birthDate' : birthDate,
-      'isEstimatedBirthDate' : isEstimatedBirthDate,
+      'birthDate': birthDate,
+      'isEstimatedBirthDate': isEstimatedBirthDate,
       'numberOfSaves': numberOfSaves,
       'volunteer': volunteer,
-      'description': description, 
-      'location': location, 
+      'description': description,
+      'location': location,
     };
   }
 
@@ -71,8 +71,8 @@ class Dog {
       isEstimatedBirthDate: map['isEstimatedBirthDate'],
       numberOfSaves: map['numberOfSaves'] ?? 0,
       volunteer: map['volunteer'],
-      description: map['description'] ?? '', 
-      location: map['location'] ?? '', 
+      description: map['description'] ?? '',
+      location: map['location'] ?? '',
     );
   }
 

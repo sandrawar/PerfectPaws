@@ -5,13 +5,13 @@ part 'sync_act.g.dart';
 @HiveType(typeId: 1)
 class SyncAction {
   @HiveField(0)
-  final String actionType; 
-  
+  final String actionType;
+
   @HiveField(1)
-  final String dogId; 
-  
+  final String dogId;
+
   @HiveField(2)
-  final DateTime timestamp; 
+  final DateTime timestamp;
 
   SyncAction({
     required this.actionType,

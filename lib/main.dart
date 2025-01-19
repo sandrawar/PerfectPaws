@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -13,38 +12,38 @@ import 'package:perfect_paws/offline_data_sync/sync_service.dart';
 import 'package:perfect_paws/volunteer_features/volunteer_dog_list_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-import 'dogs_list_logic/dogs_list_screen.dart'; 
-import 'auth/login_screen.dart'; 
-import 'auth/register_screen.dart'; 
+import 'dogs_list_logic/dogs_list_screen.dart';
+import 'auth/login_screen.dart';
+import 'auth/register_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'language/locale_provider.dart';
 import 'language/settings_screen.dart';
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
+  final errorNotifier = ErrorNotifier();
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
   } catch (e) {
+    errorNotifier.setError(
+        'An error occurred while processing the action. Please try again later.');
   }
-  
-  //Hive.deleteFromDisk(); 
+
+  //Hive.deleteFromDisk();
   await Hive.initFlutter();
 
   // Usuń wszystkie dane Hive
   //await Hive.deleteFromDisk();
-   Hive.registerAdapter(DogAdapter());
+  Hive.registerAdapter(DogAdapter());
   Hive.registerAdapter(SyncActionAdapter());
 
+  await Hive.openBox<SyncAction>('syncActions');
 
-  var syncActionBox = await Hive.openBox<SyncAction>('syncActions');
-   
-   var syncService = SyncService(Hive.box<SyncAction>('syncActions'));
+  var syncService = SyncService(Hive.box<SyncAction>('syncActions'));
 
   NetworkStatusService().connectivityStream.listen((result) async {
     if (result != ConnectivityResult.none) {
@@ -54,11 +53,13 @@ Future<void> main() async {
 
   //await Hive.deleteFromDisk(); // Usuwa wszystkie boxy i ich dane
 
-  
   runApp(ChangeNotifierProvider(
+    create: (_) => ErrorNotifier(),
+    child: ChangeNotifierProvider(
       create: (_) => LocaleProvider(),
       child: const MyApp(),
-    ));
+    ),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -68,27 +69,44 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final localeProvider = Provider.of<LocaleProvider>(context);
     return MaterialApp.router(
-
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        AppLocalizations.delegate
-      ],
-      supportedLocales: const [
-        Locale('en', 'US'), 
-        Locale('es', 'ES'),
-        Locale('pl', 'PL'), 
-      ],     
-      routerConfig: _router,
-      title: "Perfect Paws",
-      locale: localeProvider.locale,
-
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepOrange,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          AppLocalizations.delegate
+        ],
+        supportedLocales: const [
+          Locale('en', 'US'),
+          Locale('es', 'ES'),
+          Locale('pl', 'PL'),
+        ],
+        routerConfig: _router,
+        title: "Perfect Paws",
+        locale: localeProvider.locale,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.deepOrange,
+          ),
         ),
-      ),
-    );
+        builder: (context, child) {
+          // Consume error message to show SnackBar
+          return Consumer<ErrorNotifier>(
+            builder: (context, errorNotifier, child) {
+              if (errorNotifier.errorMessage != null) {
+                // Show SnackBar with the error message
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(errorNotifier.errorMessage!),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                });
+              }
+              return child!;
+            },
+            child: child,
+          );
+        });
   }
 }
 
@@ -103,17 +121,18 @@ final GoRouter _router = GoRouter(
   ),
   redirect: (context, state) {
     final isLoggedIn = FirebaseAuth.instance.currentUser != null;
-    final isOnLoginPage = state.matchedLocation == '/login' || state.matchedLocation == '/register';
+    final isOnLoginPage = state.matchedLocation == '/login' ||
+        state.matchedLocation == '/register';
 
     if (!isLoggedIn && !isOnLoginPage) {
-      return '/login'; 
+      return '/login';
     }
 
     if (isLoggedIn && isOnLoginPage) {
-      return '/'; 
+      return '/';
     }
 
-    return null; 
+    return null;
   },
   routes: [
     GoRoute(
@@ -135,10 +154,11 @@ final GoRouter _router = GoRouter(
       path: '/volunteer-dogs',
       name: 'volunteerDogs',
       builder: (context, state) => const VolunteerDogsListScreen(),
-    ),GoRoute(
+    ),
+    GoRoute(
       path: '/settings',
       name: 'settings',
-      builder: (context, state) => SettingsScreen(),
+      builder: (context, state) => const SettingsScreen(),
     ),
     GoRoute(
       path: '/dog-details/:id',
@@ -157,3 +177,12 @@ final GoRouter _router = GoRouter(
   ],
 );
 
+class ErrorNotifier extends ChangeNotifier {
+  String? _errorMessage;
+  String? get errorMessage => _errorMessage;
+
+  void setError(String error) {
+    _errorMessage = error;
+    notifyListeners();
+  }
+}
