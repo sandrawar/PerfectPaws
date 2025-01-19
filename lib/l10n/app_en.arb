@@ -49,5 +49,9 @@
     "registerError" : "Registration failed.",
     "myDogs" : "My posts",
     "numberOfSaves" : "Number of saves",
-    "noPosts" : "You have no posts right now"
+    "noPosts" : "You have no posts right now",
+    "dogsBirthDate" : "Dog's birth date",
+    "chooseDate" : "Choose date",
+    "isEstimated" : "is date only estimated?",
+    "dateFormat": "MM/dd/yyyy"
   }

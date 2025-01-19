@@ -15,6 +15,7 @@ import '../volunteer_features/add_dog_form.dart';
 import 'dog_class.dart';
 import 'dog_card.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:perfect_paws/dogs_list_logic/dog_detail_card.dart';
 
 class DogsListScreen extends StatefulWidget {
   const DogsListScreen({super.key});
@@ -36,8 +37,10 @@ with SingleTickerProviderStateMixin{
   Box<SyncAction>? _syncActionBox;
 
   Future<void> _openBox() async {
+    
+    //Hive.deleteFromDisk(); 
     _savedDogsBox = await Hive.openBox<Dog>('saved_dogs');
-    //_savedDogsBox?.clear();
+   // _savedDogsBox?.clear();
   }
 
   Future<void> _initializeSyncService() async {
@@ -174,7 +177,7 @@ with SingleTickerProviderStateMixin{
                         itemBuilder: (context, index) {
                           final dog = dogs[index];
                           return GestureDetector(
-                            onTap: () => _showDogDetails(dog),
+                            onTap: () => DogDetailsCard.showDogDetails(dog, context, _toggleSaved),
                             child: DogCard(
                               dog: dog,
                               onFavoriteToggle: () {
@@ -206,7 +209,7 @@ with SingleTickerProviderStateMixin{
                   itemBuilder: (context, index) {
                     final dog = dogs[index];
                     return GestureDetector(
-                      onTap: () => _showDogDetails(dog),
+                      onTap: () => DogDetailsCard.showDogDetails(dog, context, _toggleSaved),
                       child: DogCard(
                         dog: dog,
                         onFavoriteToggle: () {
@@ -233,45 +236,33 @@ with SingleTickerProviderStateMixin{
       }
 
       if (snapshot.data == true) {
-        return FloatingActionButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) {
-                return const AddDogForm();
-              },
-            );
-          },
-          child: const Icon(Icons.add),
-        );
-      } else {
-        return const SizedBox.shrink();
-      }
+      return FloatingActionButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return const AddDogForm();
+            },
+          ).then((result) {
+            if (result == true) {
+              setState(() {
+                // Odświeżanie ekranu po dodaniu psa
+              });
+            }
+          });
+        },
+        child: const Icon(Icons.add),
+      );
+    } else {
+      return const SizedBox.shrink();
+    
+    };
     },
   ),
 );
 var myDrawer = MenuScreen();
-     return GestureDetector(
-      onTap: toggle,
-      child: AnimatedBuilder(
-    animation: animationController,
-    builder: (context, _){
-      double slide = maxSlide*animationController.value;
-      double scale = 1 - (animationController.value * 0.3);
-    return Stack(
-      children: <Widget>[
-        myDrawer,
-        Transform(
-          transform: Matrix4.identity()
-          ..translate(slide)
-          ..scale(scale),
-          alignment: Alignment.centerLeft,
-          child: myChild,)
-      ],
-    );
-  }
-  )
-    );
+
+    return MenuScreen.animatedMenu(myChild, myDrawer, maxSlide, toggle, animationController);
   }
 
   Widget _buildDogList(List<Dog> dogs) {
@@ -284,7 +275,7 @@ var myDrawer = MenuScreen();
             itemBuilder: (context, index) {
               final dog = dogs[index];
               return GestureDetector(
-                onTap: () => _showDogDetails(dog),
+                onTap: () => DogDetailsCard.showDogDetails(dog, context, _toggleSaved),
                 child: DogCard(
                   dog: dog,
                   onFavoriteToggle: () {
@@ -323,16 +314,7 @@ var myDrawer = MenuScreen();
     return data != null && data['isVolunteer'] == true;
   }
 
-  void _logout() async {
-    try {
-      await FirebaseAuth.instance.signOut();
-      context.go('/login');
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Błąd przy wylogowywaniu: $e")),
-      );
-    }
-  }
+
 
   Future<void> _toggleSaved(Dog dog) async {
     if (dog.id.isEmpty) {
@@ -402,67 +384,6 @@ void _showSaveAnimation(BuildContext conext) {
             });
           },
         ),
-      );
-    },
-  );
-}
-
-
-void _showDogDetails(Dog dog) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return Scaffold(
-            body: myPage(
-              elements: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      dog.name,
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-                    ),
-                    IconButton(
-                      alignment: Alignment.topRight,
-                      icon: const Icon(Icons.close, color: Colors.white,),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),]
-                ),
-                const SizedBox(height: 16),
-                if (dog.imageUrl.isNotEmpty)
-                  ClipOval(
-                    child:
-                  Image.network(
-                    dog.imageUrl,
-                    height: 200,
-                    width: 200,
-                    fit: BoxFit.cover,
-                  )),
-                const SizedBox(height: 20),
-                
-                const SizedBox(height: 16),
-                Text(
-                  'Wiek: ${dog.age}',
-                  style: const TextStyle(fontSize: 18, color: Colors.white),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Opis: ${dog.description}',
-                  style: const TextStyle(fontSize: 18, color: Colors.white),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Lokalizacja: ${dog.location}',
-                  style: const TextStyle(fontSize: 18, color: Colors.white),
-                ),
-              const SizedBox(height: 16),
-              ],
-              onNext: () {
-                Navigator.of(context).pop(); // Close the dialog if needed
-              },
-            ),
       );
     },
   );

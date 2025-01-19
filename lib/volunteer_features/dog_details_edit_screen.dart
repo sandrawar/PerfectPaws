@@ -24,7 +24,7 @@ class _DogDetailsScreenState extends State<DogDetailsScreen> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.dog.name);
-    _ageController = TextEditingController(text: widget.dog.age.toString());
+    _ageController = TextEditingController(text: widget.dog.birthDate.toString());
     _descriptionController =
         TextEditingController(text: widget.dog.description);
     _locationController = TextEditingController(text: widget.dog.location);
@@ -44,7 +44,7 @@ class _DogDetailsScreenState extends State<DogDetailsScreen> {
   final localizations = AppLocalizations.of(context);
     final updatedDog = widget.dog.copyWith(
       name: _nameController.text,
-      age: int.tryParse(_ageController.text) ?? widget.dog.age,
+      //TODO birthDate: int.tryParse(_ageController.text) ?? widget.dog.birthDate,
       description: _descriptionController.text,
       location: _locationController.text,
     );
@@ -82,7 +82,7 @@ class _DogDetailsScreenState extends State<DogDetailsScreen> {
         ),
       ),
       
-    backgroundColor: Color.fromRGBO(197, 174, 174, 2),
+    backgroundColor: const Color.fromRGBO(197, 174, 174, 2),
       body: myPage(
         elements: [
             if (widget.dog.imageUrl.isNotEmpty)
@@ -91,37 +91,36 @@ class _DogDetailsScreenState extends State<DogDetailsScreen> {
             TextField(
               controller: _nameController,
               decoration: InputDecoration(labelText: localizations!.dogsName, 
-              labelStyle: TextStyle(color: Colors.white),
-              //hintText: localizations!.enterDogName,    // Hint text
-            hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)), // Hint text color
+              labelStyle: const TextStyle(color: Colors.white),
+            hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
     ),
-    style: TextStyle(color: Colors.white),
+    style: const TextStyle(color: Colors.white),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _ageController,
-              decoration: InputDecoration(labelText: localizations.dogsAge, labelStyle: TextStyle(color: Colors.white),),
+              decoration: InputDecoration(labelText: localizations.dogsAge, labelStyle: const TextStyle(color: Colors.white),),
               keyboardType: TextInputType.number,
-    style: TextStyle(color: Colors.white),
+    style: const TextStyle(color: Colors.white),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _descriptionController,
-              decoration: InputDecoration(labelText: localizations.dogsDescription, labelStyle: TextStyle(color: Colors.white),),
+              decoration: InputDecoration(labelText: localizations.dogsDescription, labelStyle: const TextStyle(color: Colors.white),),
               maxLines: 3,
-    style: TextStyle(color: Colors.white),
+    style: const TextStyle(color: Colors.white),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _locationController,
-              decoration: InputDecoration(labelText: localizations.dogsLocation, labelStyle: TextStyle(color: Colors.white),),
-    style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(labelText: localizations.dogsLocation, labelStyle: const TextStyle(color: Colors.white),),
+    style: const TextStyle(color: Colors.white),
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _updateDogData,
               child: Text(localizations.saveChanges,
-    style: TextStyle(color: Colors.white),),
+    style: const TextStyle(color: Colors.white),),
             ),
           ],
           onNext:  _updateDogData,

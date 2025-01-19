@@ -49,5 +49,9 @@
     "registerError" : "Error al registrarse.",
     "myDogs" : "Mis publicaciones",
     "numberOfSaves" : "Número de guardados",
-    "noPosts" : "No tienes publicaciones en este momento"
+    "noPosts" : "No tienes publicaciones en este momento",
+    "dogsBirthDate" : "Dog's birth date",
+    "chooseDate" : "Choose date",
+    "isEstimated" : "is date only estimated?",
+    "dateFormat": "dd/MM/yyyy"
 }

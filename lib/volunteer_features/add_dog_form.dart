@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:camera/camera.dart';
+import 'package:intl/intl.dart';
 import 'dart:io';  
 import '../dogs_list_logic/dog_class.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,17 +19,19 @@ class AddDogForm extends StatefulWidget {
 class _AddDogFormState extends State<AddDogForm> {
   final _nameController = TextEditingController();
   final _imageController = TextEditingController();
-  final _ageController = TextEditingController();
-  final _descriptionController = TextEditingController(); 
-  final _locationController = TextEditingController(); 
+  final _descriptionController = TextEditingController();
+  final _locationController = TextEditingController();
   final _volunteerController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   int _currentStep = 0;
-  XFile? _image; 
-  CameraController? _controller;  
-  List<CameraDescription> _cameras = [];  
+  XFile? _image;
+  CameraController? _controller;
+  List<CameraDescription> _cameras = [];
   bool _isCameraInitialized = false;
-  final ImagePicker _picker = ImagePicker(); 
+  final ImagePicker _picker = ImagePicker();
+
+  DateTime? _birthDate;
+  bool _isEstimatedBirthDate = false;
 
   @override
   void initState() {
@@ -45,8 +48,8 @@ class _AddDogFormState extends State<AddDogForm> {
   }
 
   Future<void> _initializeCamera() async {
-    _cameras = await availableCameras();  
-    _controller = CameraController(_cameras[0], ResolutionPreset.high);  
+    _cameras = await availableCameras();
+    _controller = CameraController(_cameras[0], ResolutionPreset.high);
     await _controller!.initialize();
     setState(() {
       _isCameraInitialized = true;
@@ -62,7 +65,7 @@ class _AddDogFormState extends State<AddDogForm> {
       final XFile photo = await _controller!.takePicture();
       setState(() {
         _image = photo;
-        _imageController.text = photo.path; 
+        _imageController.text = photo.path;
       });
     } catch (e) {}
   }
@@ -76,8 +79,7 @@ class _AddDogFormState extends State<AddDogForm> {
           _imageController.text = pickedFile.path;
         });
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   Future<String> _uploadImageToFirebase(XFile image) async {
@@ -86,7 +88,7 @@ class _AddDogFormState extends State<AddDogForm> {
       final storageReference = FirebaseStorage.instance
           .ref()
           .child('dogs_images/${DateTime.now().millisecondsSinceEpoch}.jpg');
-      
+
       await storageReference.putFile(file);
 
       final imageUrl = await storageReference.getDownloadURL();
@@ -98,25 +100,22 @@ class _AddDogFormState extends State<AddDogForm> {
 
   @override
   Widget build(BuildContext context) {
-    
-  final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context);
     return AlertDialog(
       title: Text(localizations!.addDog),
-      content: 
-      Form(
-  key: _formKey,
-  child: AnimatedSwitcher(
-    duration: const Duration(milliseconds: 300),
-    transitionBuilder: (child, animation) {
-      return FadeTransition(
-        opacity: animation,
-        child: child,
-      );
-    },
-    child: _buildStepContent(_currentStep, localizations),
-  ),
-),
-
+      content: Form(
+        key: _formKey,
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          transitionBuilder: (child, animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+          child: _buildStepContent(_currentStep, localizations),
+        ),
+      ),
       actions: [
         if (_currentStep > 0)
           TextButton(
@@ -144,114 +143,134 @@ class _AddDogFormState extends State<AddDogForm> {
   }
 
   Widget _buildStepContent(int step, AppLocalizations localizations) {
-  switch (step) {
-    case 0:
-      return Column(
-        key: const ValueKey(0), // Klucz dla kroku 0
-        children: [
-          TextFormField(
-            controller: _nameController,
-            decoration: InputDecoration(labelText: localizations.dogsName),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return localizations.dogsNameNullCheck;
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            controller: _descriptionController,
-            decoration: InputDecoration(labelText: localizations.dogsDescription),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return localizations.dogsDescriptionNullCheck;
-              }
-              return null;
-            },
-          ),
-          TextFormField(
-            controller: _locationController,
-            decoration: InputDecoration(labelText: localizations.dogsLocation),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return localizations.dogsLocationNullCheck;
-              }
-              return null;
-            },
-          ),
-        ],
-      );
-    case 1:
-      return Column(
-        key: const ValueKey(1), // Klucz dla kroku 1
-        children: [
-          if (_isCameraInitialized && _image == null) ...[
-            SizedBox(
-              height: 300,
-              width: double.infinity,
-              child: CameraPreview(_controller!),
+
+final formattedDate = DateFormat.yMMMMd(localizations.localeName).format(DateTime.now());
+    switch (step) {
+      case 0:
+        return Column(
+          key: const ValueKey(0),
+          children: [
+            TextFormField(
+              controller: _nameController,
+              decoration: InputDecoration(labelText: localizations.dogsName),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return localizations.dogsNameNullCheck;
+                }
+                return null;
+              },
             ),
-            ElevatedButton(
-              onPressed: _takePicture,
-              child: Text(localizations.takePicture),
+            TextFormField(
+              controller: _descriptionController,
+              decoration: InputDecoration(labelText: localizations.dogsDescription),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return localizations.dogsDescriptionNullCheck;
+                }
+                return null;
+              },
             ),
-            ElevatedButton(
-              onPressed: _pickImageFromGallery,
-              child: Text(localizations.choosePicture),
+            TextFormField(
+              controller: _locationController,
+              decoration: InputDecoration(labelText: localizations.dogsLocation),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return localizations.dogsLocationNullCheck;
+                }
+                return null;
+              },
             ),
           ],
-          if (_image != null) ...[
-            Image.file(
-              File(_image!.path),
-              height: 150,
-              width: 150,
-              fit: BoxFit.cover,
+        );
+      case 1:
+        return Column(
+          key: const ValueKey(1),
+          children: [
+            if (_isCameraInitialized && _image == null) ...[
+              SizedBox(
+                height: 300,
+                width: double.infinity,
+                child: CameraPreview(_controller!),
+              ),
+              ElevatedButton(
+                onPressed: _takePicture,
+                child: Text(localizations.takePicture),
+              ),
+              ElevatedButton(
+                onPressed: _pickImageFromGallery,
+                child: Text(localizations.choosePicture),
+              ),
+            ],
+            if (_image != null) ...[
+              Image.file(
+                File(_image!.path),
+                height: 150,
+                width: 150,
+                fit: BoxFit.cover,
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _image = null;
+                  });
+                },
+                child: Text(localizations.takePicture),
+              ),
+            ],
+          ],
+        );
+      case 2:
+        return Column(
+          key: const ValueKey(2),
+          children: [
+            Text(localizations.dogsBirthDate),
+            TextButton(
+              onPressed: _selectBirthDate,
+              child: Text(_birthDate != null
+                  ? formattedDate
+                  : localizations.chooseDate),
             ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
+            SwitchListTile(
+              title: Text(localizations.isEstimated),
+              value: _isEstimatedBirthDate,
+              onChanged: (value) {
                 setState(() {
-                  _image = null;
+                  _isEstimatedBirthDate = value;
                 });
               },
-              child: Text(localizations.takePicture),
+            ),
+            TextFormField(
+              controller: _volunteerController,
+              decoration: InputDecoration(labelText: localizations.volunteer),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return localizations.volunteerNullCheck;
+                }
+                return null;
+              },
+              enabled: false,
             ),
           ],
-        ],
-      );
-    case 2:
-      return Column(
-        key: const ValueKey(2), // Klucz dla kroku 2
-        children: [
-          TextFormField(
-            controller: _ageController,
-            decoration: InputDecoration(labelText: localizations.dogsAge),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return localizations.dogsAgeNullCheck;
-              }
-              return null;
-            },
-            keyboardType: TextInputType.number,
-          ),
-          TextFormField(
-            controller: _volunteerController,
-            decoration: InputDecoration(labelText: localizations.volunteer),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return localizations.volunteerNullCheck;
-              }
-              return null;
-            },
-            enabled: false,
-          ),
-        ],
-      );
-    default:
-      return const SizedBox.shrink();
+        );
+      default:
+        return const SizedBox.shrink();
+    }
   }
-}
 
+  Future<void> _selectBirthDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != _birthDate) {
+      setState(() {
+        _birthDate = picked;
+      });
+    }
+  }
 
   void _nextStep() {
     if (_formKey.currentState!.validate()) {
@@ -271,9 +290,8 @@ class _AddDogFormState extends State<AddDogForm> {
     final localizations = AppLocalizations.of(context);
     if (_formKey.currentState!.validate()) {
       final name = _nameController.text;
-      final description = _descriptionController.text; 
-      final age = int.parse(_ageController.text);
-      final location = _locationController.text; 
+      final description = _descriptionController.text;
+      final location = _locationController.text;
       final volunteer = _volunteerController.text;
 
       String? imageUrl = '';
@@ -284,11 +302,12 @@ class _AddDogFormState extends State<AddDogForm> {
       final dog = Dog(
         name: name,
         imageUrl: imageUrl,
-        age: age,
+        birthDate: Timestamp.fromDate(_birthDate!),
+        isEstimatedBirthDate: _isEstimatedBirthDate,
         numberOfSaves: 0,
         volunteer: volunteer,
-        description: description, 
-        location: location, 
+        description: description,
+        location: location,
       );
 
       try {
@@ -296,7 +315,7 @@ class _AddDogFormState extends State<AddDogForm> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(localizations!.dogAdded)),
         );
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(true);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Błąd: $e')),

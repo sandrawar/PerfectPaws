@@ -5,7 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:perfect_paws/dogs_list_logic/dog_class.dart';
-import 'package:perfect_paws/dogs_list_logic/dog_details_screen.dart';
+import 'package:perfect_paws/volunteer_features/dog_details_edit_screen.dart';
 import 'package:perfect_paws/auth/firebase_options.dart';
 import 'package:perfect_paws/offline_data_sync/networ_status.dart';
 import 'package:perfect_paws/offline_data_sync/sync_act.dart';
@@ -30,11 +30,14 @@ Future<void> main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    print('Firebase initialized successfully');
   } catch (e) {
-    print('Firebase initialization failed: $e');
   }
+  
+  //Hive.deleteFromDisk(); 
   await Hive.initFlutter();
+
+  // Usuń wszystkie dane Hive
+  //await Hive.deleteFromDisk();
    Hive.registerAdapter(DogAdapter());
   Hive.registerAdapter(SyncActionAdapter());
 
@@ -48,6 +51,9 @@ Future<void> main() async {
       await syncService.syncOfflineChanges();
     }
   });
+
+  //await Hive.deleteFromDisk(); // Usuwa wszystkie boxy i ich dane
+
   
   runApp(ChangeNotifierProvider(
       create: (_) => LocaleProvider(),

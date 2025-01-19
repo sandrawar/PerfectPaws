@@ -69,7 +69,7 @@ with SingleTickerProviderStateMixin{
   Widget build(BuildContext context) {
     
   final localizations = AppLocalizations.of(context);
-  var myDrawer = MenuScreen();
+
     var myChild = Scaffold(
       appBar: AppBar(       
     backgroundColor: Color.fromRGBO(197, 174, 174, 1),
@@ -141,26 +141,6 @@ with SingleTickerProviderStateMixin{
         },
       ),
     );
-    return GestureDetector(
-      onTap: toggle,
-      child: AnimatedBuilder(
-    animation: animationController,
-    builder: (context, _){
-      double slide = maxSlide*animationController.value;
-      double scale = 1 - (animationController.value * 0.3);
-    return Stack(
-      children: <Widget>[
-        myDrawer,
-        Transform(
-          transform: Matrix4.identity()
-          ..translate(slide)
-          ..scale(scale),
-          alignment: Alignment.centerLeft,
-          child: myChild,)
-      ],
-    );
-  }
-  )
-    );
+    return MenuScreen.animatedMenu(myChild, MenuScreen(), maxSlide, toggle, animationController);
   }
 }

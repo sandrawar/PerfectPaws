@@ -18,7 +18,7 @@ with SingleTickerProviderStateMixin{
   void initState() {
     super.initState();
     _animationController = AnimationController(vsync: this,
-    duration: Duration(milliseconds: 600),);
+    duration: const Duration(milliseconds: 600),);
     _animation = CurvedAnimation(parent: _animationController, curve: Curves.easeIn,);
   }
   
@@ -73,7 +73,7 @@ class _PageState extends State<myPage>{
   void onInit() async {
     
     for(GlobalKey<_ItemFaderState> key in keys){
-      await Future.delayed(Duration(milliseconds: 60));
+      await Future.delayed(const Duration(milliseconds: 60));
       key.currentState!.show();
     }
 
@@ -84,12 +84,12 @@ class _PageState extends State<myPage>{
 
     for(GlobalKey<_ItemFaderState> key in keys){
       if (key.currentState != null) {
-        Future.delayed(Duration(milliseconds: 40));
+        Future.delayed(const Duration(milliseconds: 40));
         key.currentState!.hide();
       }
     }
     
-  Future.delayed(Duration(milliseconds: 100)); 
+  Future.delayed(const Duration(milliseconds: 100)); 
     widget.onNext();
   
 
@@ -100,7 +100,7 @@ class _PageState extends State<myPage>{
     
     return Scaffold(
     
-      backgroundColor: Color.fromRGBO(188, 104, 104, 1),
+      backgroundColor: const Color.fromRGBO(188, 104, 104, 1),
       body: 
       SingleChildScrollView(
   child: 

@@ -8,7 +8,7 @@ import 'package:perfect_paws/messages/message_list_screen.dart';
 import 'volunteer_features/volunteer_dog_list_screen.dart';
 
 class MenuScreen extends StatelessWidget {
-  MenuScreen({Key? key}) : super(key: key);
+  MenuScreen({super.key});
 
   final User? _currentUser = FirebaseAuth.instance.currentUser;
 
@@ -81,6 +81,30 @@ class MenuScreen extends StatelessWidget {
     );
   }
 
+  static Widget animatedMenu(Widget myChild, Widget myDrawer, double maxSlide, VoidCallback toggle, AnimationController animationController){
+   return GestureDetector(
+      onTap: toggle,
+      child: AnimatedBuilder(
+    animation: animationController,
+    builder: (context, _){
+      double slide = maxSlide*animationController.value;
+      double scale = 1 - (animationController.value * 0.3);
+    return Stack(
+      children: <Widget>[
+        myDrawer,
+        Transform(
+          transform: Matrix4.identity()
+          ..translate(slide)
+          ..scale(scale),
+          alignment: Alignment.centerLeft,
+          child: myChild,)
+      ],
+    );
+  }
+  )
+    );
+  }
+
   Widget _buildMenuItem(BuildContext context,
       {required IconData icon, required String text, required VoidCallback onTap}) {
     return ListTile(
@@ -94,7 +118,7 @@ class MenuScreen extends StatelessWidget {
     if (_currentUser == null) return false;
     final userDoc = await FirebaseFirestore.instance
         .collection('users')
-        .doc(_currentUser!.uid)
+        .doc(_currentUser.uid)
         .get();
     final data = userDoc.data();
     return data != null && data['isVolunteer'] == true;

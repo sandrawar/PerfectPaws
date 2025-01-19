@@ -49,5 +49,9 @@
     "registerError" : "Wystąpił błąd podczas rejestracji.",
     "myDogs" : "Moje ogłoszenia",
     "numberOfSaves" : "Liczba zapamiętań",
-    "noPosts" : "Nie masz aktualnie żadnych ogłoszeń"
+    "noPosts" : "Nie masz aktualnie żadnych ogłoszeń",
+    "dogsBirthDate" : "Dog's birth date",
+    "chooseDate" : "Choose date",
+    "isEstimated" : "is date only estimated?",
+    "dateFormat": "dd/MM/yyyy"
 }

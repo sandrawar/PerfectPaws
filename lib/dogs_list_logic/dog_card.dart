@@ -22,8 +22,8 @@ class DogCard extends StatelessWidget {
     fit: BoxFit.cover,)),
         title: Text(dog.name, 
     style: TextStyle(color: Colors.white),),
-        subtitle: Text('${dog.age} years old', 
-    style: TextStyle(color: Colors.white),),
+        //subtitle: Text('${dog.birthDate} years old', 
+    //style: TextStyle(color: Colors.white),),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

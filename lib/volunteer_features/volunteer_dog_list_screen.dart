@@ -31,7 +31,7 @@ with SingleTickerProviderStateMixin{
     _getDogsForVolunteer();
     animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 250),
     );
   }
 
@@ -54,20 +54,20 @@ with SingleTickerProviderStateMixin{
   final localizations = AppLocalizations.of(context);
     var myChild = Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(197, 174, 174, 1),
+        backgroundColor: const Color.fromRGBO(197, 174, 174, 1),
         automaticallyImplyLeading: false,
         leading:
           IconButton(
             alignment: Alignment.topLeft,
-        icon: Icon( Icons.menu, color: Colors.white,),
+        icon: const Icon( Icons.menu, color: Colors.white,),
         onPressed: () {
           toggle();
         },
       ),
         title: Text(localizations!.myDogs, 
-    style: TextStyle(color: Colors.white),),
+    style: const TextStyle(color: Colors.white),),
       ),
-  backgroundColor: Color.fromRGBO(188, 104, 104, 1),
+  backgroundColor: const Color.fromRGBO(188, 104, 104, 1),
       body: StreamBuilder<QuerySnapshot>(
         stream: _dogsStream,
         builder: (context, snapshot) {
@@ -95,18 +95,17 @@ with SingleTickerProviderStateMixin{
               return Padding(
                 padding: const EdgeInsetsDirectional.all(16),
                 child: Card(
-      color: Color.fromRGBO(197, 174, 174, 1),
+      color: const Color.fromRGBO(197, 174, 174, 1),
       child: ListTile(
-        //tileColor: Color.fromRGBO(197, 174, 174, 10),
         leading: ClipOval(
           child: Image.network(dog.imageUrl,
-    width: 50.0, // Szerokość obrazu
-    height: 50.0, // Wysokość obrazu
+    width: 50.0, 
+    height: 50.0, 
     fit: BoxFit.cover,)),
                 title: Text(dog.name, 
-    style: TextStyle(color: Colors.white),),
+    style: const TextStyle(color: Colors.white),),
                 subtitle: Text('${localizations.numberOfSaves}: ${dog.numberOfSaves}', 
-    style: TextStyle(color: Colors.white),),
+    style: const TextStyle(color: Colors.white),),
                 onTap: () {
                   context.go(
                     '/dog-details/${dog.id}',
@@ -133,28 +132,7 @@ with SingleTickerProviderStateMixin{
         child: const Icon(Icons.add),
       ),
     );
-    var myDrawer = MenuScreen();
-     return GestureDetector(
-      onTap: toggle,
-      child: AnimatedBuilder(
-    animation: animationController,
-    builder: (context, _){
-      double slide = maxSlide*animationController.value;
-      double scale = 1 - (animationController.value * 0.3);
-    return Stack(
-      children: <Widget>[
-        myDrawer,
-        Transform(
-          transform: Matrix4.identity()
-          ..translate(slide)
-          ..scale(scale),
-          alignment: Alignment.centerLeft,
-          child: myChild,)
-      ],
-    );
-  }
-  )
-    );
+     return MenuScreen.animatedMenu(myChild, MenuScreen(), maxSlide, toggle, animationController);
   }
   }
 
