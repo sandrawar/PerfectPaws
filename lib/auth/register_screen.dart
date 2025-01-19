@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -15,10 +14,15 @@ class RegisterScreen extends StatefulWidget {
 class RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _codeController = TextEditingController(); // Controller for verification code
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   String? _errorMessage;
   bool _isVolunteer = false;
+  bool _isCodeVisible = false; // To show/hide code input field
+
+  // Code to verify (for now it's hardcoded as 123)
+  final String _verificationCode = "123"; 
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
@@ -29,6 +33,14 @@ class RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
+      // If the user is a volunteer, check the verification code
+      if (_isVolunteer && _codeController.text.trim() != _verificationCode) {
+        setState(() {
+          _errorMessage = 'Incorrect verification code.';
+        });
+        return;
+      }
+
       final userCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -130,11 +142,23 @@ class RegisterScreenState extends State<RegisterScreen> {
                     onChanged: (value) {
                       setState(() {
                         _isVolunteer = value ?? false;
+                        _isCodeVisible = _isVolunteer; // Show code input if volunteer
                       });
                     },
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
+              // If the user is a volunteer, show the verification code field
+              if (_isCodeVisible)
+                TextField(
+                  controller: _codeController,
+                  decoration: InputDecoration(
+                    labelText: 'Wpisz kod weryfikacyjny',
+                    border: const OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
               const SizedBox(height: 16),
               if (_isLoading)
                 const CircularProgressIndicator()
