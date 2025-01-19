@@ -35,7 +35,7 @@ class DogsListScreenState extends State<DogsListScreen>
   Future<void> _openBox() async {
     //Hive.deleteFromDisk();
     _savedDogsBox = await Hive.openBox<Dog>('saved_dogs');
-    // _savedDogsBox?.clear();
+    //_savedDogsBox?.clear();
   }
 
   Future<void> _initializeSyncService() async {
@@ -169,8 +169,13 @@ class DogsListScreenState extends State<DogsListScreen>
 
                     final firebaseDogs = firebaseSnapshot.data ?? [];
                     dogs.addAll(firebaseDogs);
+
                     if (dogs.isEmpty) {
-                      return Center(child: Text(localizations.emptyDogsList));
+                      return Center(
+                          child: Text(
+                        localizations.emptyDogsList,
+                        style: const TextStyle(color: Colors.white),
+                      ));
                     }
 
                     return CustomScrollView(
@@ -204,33 +209,33 @@ class DogsListScreenState extends State<DogsListScreen>
 
               if (dogs.isEmpty) {
                 return Center(child: Text(localizations.emptySavedDogsList));
-              }
-
-              return CustomScrollView(
-                slivers: [
-                  SliverPadding(
-                    padding: const EdgeInsetsDirectional.all(16),
-                    sliver: SliverList.separated(
-                      itemCount: dogs.length,
-                      itemBuilder: (context, index) {
-                        final dog = dogs[index];
-                        return GestureDetector(
-                          onTap: () => DogDetailsCard.showDogDetails(
-                              dog, context, _toggleSaved),
-                          child: DogCard(
-                              dog: dog,
-                              onFavoriteToggle: () {
-                                _toggleSaved(dog);
-                              },
-                              isFavorite: dog.isSaved),
-                        );
-                      },
-                      separatorBuilder: (context, _) =>
-                          const SizedBox(height: 16),
+              } else {
+                return CustomScrollView(
+                  slivers: [
+                    SliverPadding(
+                      padding: const EdgeInsetsDirectional.all(16),
+                      sliver: SliverList.separated(
+                        itemCount: dogs.length,
+                        itemBuilder: (context, index) {
+                          final dog = dogs[index];
+                          return GestureDetector(
+                            onTap: () => DogDetailsCard.showDogDetails(
+                                dog, context, _toggleSaved),
+                            child: DogCard(
+                                dog: dog,
+                                onFavoriteToggle: () {
+                                  _toggleSaved(dog);
+                                },
+                                isFavorite: true),
+                          );
+                        },
+                        separatorBuilder: (context, _) =>
+                            const SizedBox(height: 16),
+                      ),
                     ),
-                  ),
-                ],
-              );
+                  ],
+                );
+              }
             },
           );
         },
@@ -252,9 +257,7 @@ class DogsListScreenState extends State<DogsListScreen>
                   },
                 ).then((result) {
                   if (result == true) {
-                    setState(() {
-                      // Odświeżanie ekranu po dodaniu psa
-                    });
+                    setState(() {});
                   }
                 });
               },
@@ -281,7 +284,9 @@ class DogsListScreenState extends State<DogsListScreen>
     final dogs = querySnapshot.docs.map((doc) {
       return Dog.fromMap(doc.data(), id: doc.id);
     }).toList();
-
+    for (var dog in dogs) {
+      dog.isSaved = _savedDogsBox?.containsKey(dog.id) ?? false;
+    }
     return dogs;
   }
 
@@ -353,7 +358,7 @@ class DogsListScreenState extends State<DogsListScreen>
     });
   }
 
-  void _showSaveAnimation(BuildContext conext) {
+  void _showSaveAnimation(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -365,10 +370,8 @@ class DogsListScreenState extends State<DogsListScreen>
             repeat: false,
             onLoaded: (composition) {
               Future.delayed(composition.duration, () {
-                if (mounted) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    Navigator.of(context).pop();
-                  });
+                if (context.mounted && Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
                 }
               });
             },

@@ -14,15 +14,12 @@ class RegisterScreen extends StatefulWidget {
 class RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _codeController =
-      TextEditingController(); // Controller for verification code
+  final _codeController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   String? _errorMessage;
   bool _isVolunteer = false;
-  bool _isCodeVisible = false; // To show/hide code input field
-
-  // Code to verify (for now it's hardcoded as 123)
+  bool _isCodeVisible = false;
   final String _verificationCode = "123";
 
   Future<void> _register() async {
@@ -34,7 +31,6 @@ class RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      // If the user is a volunteer, check the verification code
       if (_isVolunteer && _codeController.text.trim() != _verificationCode) {
         setState(() {
           _errorMessage = 'Incorrect verification code.';
@@ -157,15 +153,13 @@ class RegisterScreenState extends State<RegisterScreen> {
                     onChanged: (value) {
                       setState(() {
                         _isVolunteer = value ?? false;
-                        _isCodeVisible =
-                            _isVolunteer; // Show code input if volunteer
+                        _isCodeVisible = _isVolunteer;
                       });
                     },
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              // If the user is a volunteer, show the verification code field
               if (_isCodeVisible)
                 TextField(
                   controller: _codeController,
