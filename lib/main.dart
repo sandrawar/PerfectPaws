@@ -32,12 +32,7 @@ Future<void> main() async {
     errorNotifier.setError(
         'An error occurred while processing the action. Please try again later.');
   }
-
-  //Hive.deleteFromDisk();
   await Hive.initFlutter();
-
-  // Usuń wszystkie dane Hive
-  //await Hive.deleteFromDisk();
   Hive.registerAdapter(DogAdapter());
   Hive.registerAdapter(SyncActionAdapter());
 
@@ -50,8 +45,6 @@ Future<void> main() async {
       await syncService.syncOfflineChanges();
     }
   });
-
-  //await Hive.deleteFromDisk(); // Usuwa wszystkie boxy i ich dane
 
   runApp(ChangeNotifierProvider(
     create: (_) => ErrorNotifier(),
@@ -88,11 +81,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
         builder: (context, child) {
-          // Consume error message to show SnackBar
           return Consumer<ErrorNotifier>(
             builder: (context, errorNotifier, child) {
               if (errorNotifier.errorMessage != null) {
-                // Show SnackBar with the error message
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -115,7 +106,7 @@ final GoRouter _router = GoRouter(
   errorPageBuilder: (context, state) => MaterialPage(
     child: Scaffold(
       body: Center(
-        child: Text('Błąd: ${state.error}'),
+        child: Text('${AppLocalizations.of(context)!.errorMessage}; ${state.error}'),
       ),
     ),
   ),
@@ -164,11 +155,12 @@ final GoRouter _router = GoRouter(
       path: '/dog-details/:id',
       name: 'dogDetails',
       builder: (context, state) {
+    final localizations = AppLocalizations.of(context)!;
         final dogData = state.extra as Dog?;
         if (dogData == null) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Błąd')),
-            body: const Center(child: Text('Nie znaleziono szczegółów psa')),
+            appBar: AppBar(title: Text(localizations.errorMessage)),
+            body: Center(child: Text(localizations.errorMessage)),
           );
         }
         return DogDetailsScreen(dog: dogData);

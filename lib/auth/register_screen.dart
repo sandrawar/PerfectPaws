@@ -23,6 +23,8 @@ class RegisterScreenState extends State<RegisterScreen> {
   final String _verificationCode = "123";
 
   Future<void> _register() async {
+    
+    final localizations = AppLocalizations.of(context);
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -33,7 +35,7 @@ class RegisterScreenState extends State<RegisterScreen> {
     try {
       if (_isVolunteer && _codeController.text.trim() != _verificationCode) {
         setState(() {
-          _errorMessage = 'Incorrect verification code.';
+          _errorMessage = localizations!.incorrectVerificationCode;
         });
         return;
       }
@@ -67,6 +69,8 @@ class RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> saveUserData(User user, bool isVolunteer) async {
     final usersCollection = FirebaseFirestore.instance.collection('users');
+    
+    final localizations = AppLocalizations.of(context);
 
     await usersCollection.doc(user.uid).set({
       'email': user.email,
@@ -89,9 +93,9 @@ class RegisterScreenState extends State<RegisterScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+           SnackBar(
             content:
-                Text('An unexpected error occurred. Please try again later.'),
+                Text(localizations!.errorMessage),
             backgroundColor: Colors.red,
           ),
         );
@@ -127,6 +131,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                   hintStyle:
                       TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                 ),
+            style: const TextStyle(color: Colors.white),
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 16),
@@ -139,13 +144,14 @@ class RegisterScreenState extends State<RegisterScreen> {
                   hintStyle:
                       TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                 ),
+            style: const TextStyle(color: Colors.white),
                 obscureText: true,
               ),
               const SizedBox(height: 16),
               Row(
                 children: [
-                  const Text(
-                    'Czy jesteś wolontariuszem?',
+                  Text(
+                    localizations.areUVolunteer,
                     style: TextStyle(color: Colors.white),
                   ),
                   Checkbox(
@@ -164,12 +170,13 @@ class RegisterScreenState extends State<RegisterScreen> {
                 TextField(
                   controller: _codeController,
                   decoration: InputDecoration(
-                    labelText: 'Wpisz kod weryfikacyjny',
+                    labelText: localizations.enterVerificationCode,
                     border: const OutlineInputBorder(),
                     labelStyle: const TextStyle(color: Colors.white),
                     hintStyle:
                         TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                   ),
+            style: const TextStyle(color: Colors.white),
                   keyboardType: TextInputType.number,
                 ),
               const SizedBox(height: 16),

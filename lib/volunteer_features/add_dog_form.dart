@@ -96,6 +96,8 @@ class AddDogFormState extends State<AddDogForm> {
   }
 
   Future<String> _uploadImageToFirebase(XFile image) async {
+    
+    final localizations = AppLocalizations.of(context)!;
     try {
       final file = File(image.path);
       final storageReference = FirebaseStorage.instance
@@ -107,7 +109,7 @@ class AddDogFormState extends State<AddDogForm> {
       final imageUrl = await storageReference.getDownloadURL();
       return imageUrl;
     } catch (e) {
-      throw Exception("Nie udało się przesłać zdjęcia do Firebase Storage");
+      throw Exception(localizations.error);
     }
   }
 
@@ -338,7 +340,7 @@ class AddDogFormState extends State<AddDogForm> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Błąd: $e')),
+            SnackBar(content: Text('${localizations!.error}: $e')),
           );
         }
       }

@@ -6,6 +6,7 @@ import 'package:perfect_paws/dogs_list_logic/dogs_list_screen.dart';
 import 'package:perfect_paws/language/settings_screen.dart';
 import 'package:perfect_paws/messages/message_list_screen.dart';
 import 'volunteer_features/volunteer_dog_list_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MenuScreen extends StatelessWidget {
   MenuScreen({super.key});
@@ -14,6 +15,7 @@ class MenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(188, 104, 104, 1),
@@ -29,7 +31,7 @@ class MenuScreen extends StatelessWidget {
           _buildMenuItem(
             context,
             icon: Icons.home,
-            text: "Home",
+            text: localizations.dogs,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const DogsListScreen()),
@@ -38,7 +40,7 @@ class MenuScreen extends StatelessWidget {
           _buildMenuItem(
             context,
             icon: Icons.message,
-            text: "Messages",
+            text: localizations.yoursMessages,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -48,7 +50,7 @@ class MenuScreen extends StatelessWidget {
           _buildMenuItem(
             context,
             icon: Icons.settings,
-            text: "Settings",
+            text: localizations.settings,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const SettingsScreen()),
@@ -64,7 +66,7 @@ class MenuScreen extends StatelessWidget {
                 return _buildMenuItem(
                   context,
                   icon: Icons.pets,
-                  text: "My Posters",
+                  text: localizations.myDogs,
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -78,7 +80,7 @@ class MenuScreen extends StatelessWidget {
           _buildMenuItem(
             context,
             icon: Icons.exit_to_app,
-            text: "Logout",
+            text: localizations.logOut,
             onTap: () => _logout(context),
           ),
         ],
@@ -132,6 +134,7 @@ class MenuScreen extends StatelessWidget {
   }
 
   void _logout(BuildContext context) async {
+    final localizations = AppLocalizations.of(context)!;
     try {
       await FirebaseAuth.instance.signOut();
       if (context.mounted) {
@@ -140,7 +143,7 @@ class MenuScreen extends StatelessWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error while logging out: $e")),
+          SnackBar(content: Text("${localizations.error}: $e")),
         );
       }
     }

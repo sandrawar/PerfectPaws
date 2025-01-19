@@ -32,7 +32,7 @@
     "password" : "Password",
     "loginError" : "Login failed",
     "messageDeleted" : "Message has been deleted.",
-    "yoursMessages" : "Yours messages",
+    "yoursMessages" : "My messages",
     "from" : "From",
     "noMessages": "No messages to display",
     "error": "Error",
@@ -53,5 +53,13 @@
     "dogsBirthDate" : "Dog's birth date",
     "chooseDate" : "Choose date",
     "isEstimated" : "is date only estimated?",
-    "dateFormat": "MM/dd/yyyy"
+    "dateFormat": "MM/dd/yyyy",
+    "incorrectVerificationCode" : "Incorrect verification code.",
+    "errorMessage" : "An unexpected error occurred. Please try again later.",
+    "areUVolunteer" : "Are you a volunteer?",
+    "enterVerificationCode" : "Enter the verifivation code, please",
+    "estimatedDate" : "This birth date is just an estimation",
+    "deleteFromSaved" : "Delete dog from saved",
+    "saveDog" : "Add dog to remembered",
+    "logOut" : "Log out"
   }

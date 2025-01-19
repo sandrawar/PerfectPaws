@@ -144,7 +144,7 @@ class DogsListScreenState extends State<DogsListScreen>
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Błąd inicjalizacji: ${snapshot.error}'));
+            return Center(child: Text('${localizations.error}: ${snapshot.error}'));
           }
 
           return ValueListenableBuilder(
@@ -164,7 +164,7 @@ class DogsListScreenState extends State<DogsListScreen>
                     if (firebaseSnapshot.hasError) {
                       return Center(
                           child: Text(
-                              'Błąd pobierania psów: ${firebaseSnapshot.error}'));
+                              '${localizations.error}: ${firebaseSnapshot.error}'));
                     }
 
                     final firebaseDogs = firebaseSnapshot.data ?? [];
@@ -300,6 +300,8 @@ class DogsListScreenState extends State<DogsListScreen>
   }
 
   Future<void> _toggleSaved(Dog dog) async {
+    
+    final localizations = AppLocalizations.of(context)!;
     if (dog.id.isEmpty) {
       return;
     }
@@ -350,7 +352,7 @@ class DogsListScreenState extends State<DogsListScreen>
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Błąd przy zapisywaniu psa: $e")));
+            SnackBar(content: Text("${localizations.error}: $e")));
       }
     }
     setState(() {

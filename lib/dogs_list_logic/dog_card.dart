@@ -19,20 +19,17 @@ class DogCard extends StatelessWidget {
     return Card(
       color: const Color.fromRGBO(197, 174, 174, 1),
       child: ListTile(
-        //tileColor: Color.fromRGBO(197, 174, 174, 10),
         leading: ClipOval(
             child: Image.network(
           dog.imageUrl,
-          width: 50.0, // Szerokość obrazu
-          height: 50.0, // Wysokość obrazu
+          width: 50.0, 
+          height: 50.0, 
           fit: BoxFit.cover,
         )),
         title: Text(
           dog.name,
           style: const TextStyle(color: Colors.white),
         ),
-        //subtitle: Text('${dog.birthDate} years old',
-        //style: TextStyle(color: Colors.white),),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

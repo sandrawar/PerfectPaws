@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:perfect_paws/dogs_list_logic/dog_class.dart';
 import 'package:perfect_paws/volunteer_features/item_fader.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 abstract class DogDetailsCard {
   static void showDogDetails(Dog dog, context, Function onFavoriteToggle) {
+    final localizations = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) {
@@ -43,26 +45,27 @@ abstract class DogDetailsCard {
               const SizedBox(height: 20),
               const SizedBox(height: 16),
               Text(
-                'Wiek: ${DateFormat.yMMMMd(Localizations.localeOf(context).toString()).format(dog.birthDate.toDate())}',
+                '${localizations.dogsBirthDate}: ${DateFormat.yMMMMd(Localizations.localeOf(context).toString()).format(dog.birthDate.toDate())}'
+                '${dog.isEstimatedBirthDate ? " (${localizations.estimatedDate})" : ""}',
                 style: const TextStyle(fontSize: 18, color: Colors.white),
               ),
               const SizedBox(height: 16),
               Text(
-                'Opis: ${dog.description}',
+                '${localizations.dogsDescription}: ${dog.description}',
                 style: const TextStyle(fontSize: 18, color: Colors.white),
               ),
               const SizedBox(height: 16),
               Text(
-                'Lokalizacja: ${dog.location}',
+                '${localizations.dogsLocation}: ${dog.location}',
                 style: const TextStyle(fontSize: 18, color: Colors.white),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
-                  onFavoriteToggle(dog); // Zapisuje psa
-                  Navigator.of(context).pop(); // Zamykamy dialog
+                  onFavoriteToggle(dog); 
+                  Navigator.of(context).pop(); 
                 },
-                child: Text(dog.isSaved ? 'Usuń z zapisanych' : 'Zapisz psa'),
+                child: Text(dog.isSaved ? localizations.deleteFromSaved : localizations.saveDog),
               ),
             ],
             onNext: () {

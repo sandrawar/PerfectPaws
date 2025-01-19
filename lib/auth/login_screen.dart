@@ -57,6 +57,7 @@ class LoginScreenState extends State<LoginScreen> {
                 hintStyle:
                     TextStyle(color: Colors.white.withValues(alpha: 0.7)),
               ),
+              style: const TextStyle(color: Colors.white),
             ),
             TextField(
               controller: _passwordController,
@@ -67,6 +68,7 @@ class LoginScreenState extends State<LoginScreen> {
                 hintStyle:
                     TextStyle(color: Colors.white.withValues(alpha: 0.7)),
               ),
+              style: const TextStyle(color: Colors.white)
             ),
             const SizedBox(height: 20),
             ElevatedButton(

@@ -40,27 +40,28 @@ class SettingsScreenState extends State<SettingsScreen>
         leading: IconButton(
           alignment: Alignment.topLeft,
           icon: const Icon(Icons.menu),
+          color: Colors.white,
           onPressed: () {
             toggle();
           },
         ),
-        title: Text(AppLocalizations.of(context)?.settings ?? 'Settings'),
+        title: Text(AppLocalizations.of(context)?.settings ?? 'Settings', style: const TextStyle(color: Colors.white)),
       ),
       backgroundColor: const Color.fromRGBO(188, 104, 104, 1),
       body: ListView(
         children: [
           ListTile(
-            title: const Text('English'),
+            title: const Text('English', style: TextStyle(color: Colors.white)),
             trailing: currentLocale == 'en' ? const Icon(Icons.check) : null,
             onTap: () => localeProvider.setLocale(const Locale('en')),
           ),
           ListTile(
-            title: const Text('Polski'),
+            title: const Text('Polski', style: TextStyle(color: Colors.white)),
             trailing: currentLocale == 'pl' ? const Icon(Icons.check) : null,
             onTap: () => localeProvider.setLocale(const Locale('pl')),
           ),
           ListTile(
-            title: const Text('Espańol'),
+            title: const Text('Espańol', style: TextStyle(color: Colors.white)),
             trailing: currentLocale == 'es' ? const Icon(Icons.check) : null,
             onTap: () => localeProvider.setLocale(const Locale('es')),
           ),

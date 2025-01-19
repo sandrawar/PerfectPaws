@@ -28,7 +28,7 @@ class DogDetailsScreenState extends State<DogDetailsScreen> {
         TextEditingController(text: widget.dog.description);
     _locationController = TextEditingController(text: widget.dog.location);
     _selectedBirthDate =
-        widget.dog.birthDate.toDate(); // Set initial date to dog's birth date
+        widget.dog.birthDate.toDate(); 
   }
 
   @override
@@ -39,7 +39,6 @@ class DogDetailsScreenState extends State<DogDetailsScreen> {
     super.dispose();
   }
 
-  // Function to show the date picker and update the birth date
   Future<void> _selectBirthDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
@@ -50,7 +49,7 @@ class DogDetailsScreenState extends State<DogDetailsScreen> {
 
     if (pickedDate != null && pickedDate != _selectedBirthDate) {
       setState(() {
-        _selectedBirthDate = pickedDate; // Update the selected birth date
+        _selectedBirthDate = pickedDate; 
       });
     }
   }
@@ -60,7 +59,7 @@ class DogDetailsScreenState extends State<DogDetailsScreen> {
 
     final updatedDog = widget.dog.copyWith(
       name: _nameController.text,
-      birthDate: Timestamp.fromDate(_selectedBirthDate), // Store as Timestamp
+      birthDate: Timestamp.fromDate(_selectedBirthDate), 
       description: _descriptionController.text,
       location: _locationController.text,
     );
@@ -119,12 +118,12 @@ class DogDetailsScreenState extends State<DogDetailsScreen> {
           const SizedBox(height: 8),
           GestureDetector(
             onTap: () =>
-                _selectBirthDate(context), // Show the date picker when tapped
+                _selectBirthDate(context), 
             child: AbsorbPointer(
               child: TextField(
                 controller: TextEditingController(
                     text: '${_selectedBirthDate.toLocal()}'
-                        .split(' ')[0]), // Display the date
+                        .split(' ')[0]), 
                 decoration: InputDecoration(
                   labelText: localizations.dogsAge,
                   labelStyle: const TextStyle(color: Colors.white),

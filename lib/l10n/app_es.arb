@@ -32,7 +32,7 @@
     "password" : "Contraseña",
     "loginError" : "Error al iniciar sesión",
     "messageDeleted" : "El mensaje ha sido eliminado.",
-    "yoursMessages" : "Tus mensajes",
+    "yoursMessages" : "Mis mensajes",
     "from" : "De",
     "noMessages": "No hay mensajes para mostrar",
     "error": "Error",
@@ -50,8 +50,15 @@
     "myDogs" : "Mis publicaciones",
     "numberOfSaves" : "Número de guardados",
     "noPosts" : "No tienes publicaciones en este momento",
-    "dogsBirthDate" : "Dog's birth date",
-    "chooseDate" : "Choose date",
-    "isEstimated" : "is date only estimated?",
-    "dateFormat": "dd/MM/yyyy"
+    "dogsBirthDate" : "",
+    "chooseDate" : "",
+    "isEstimated" : "",
+    "dateFormat": "dd/MM/yyyy",
+    "incorrectVerific" : "",
+    "areUVolunteer" : "",
+    "enterVerificationCode" : "",
+    "estimatedDate" : "",
+    "deleteFromSaved" : "",
+    "saveDog" : "",
+    "logOut" : ""
 }
