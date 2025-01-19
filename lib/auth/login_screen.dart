@@ -38,20 +38,35 @@ class LoginScreenState extends State<LoginScreen> {
     final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text(localizations.logIn),
+        backgroundColor: const Color.fromRGBO(197, 174, 174, 1),
+        title: Text(
+          localizations.logIn,
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
+      backgroundColor: const Color.fromRGBO(188, 104, 104, 1),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(labelText: localizations.email),
+              decoration: InputDecoration(
+                labelText: localizations.email,
+                labelStyle: const TextStyle(color: Colors.white),
+                hintStyle:
+                    TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+              ),
             ),
             TextField(
               controller: _passwordController,
               obscureText: true,
-              decoration: InputDecoration(labelText: localizations.password),
+              decoration: InputDecoration(
+                labelText: localizations.password,
+                labelStyle: const TextStyle(color: Colors.white),
+                hintStyle:
+                    TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+              ),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -62,7 +77,8 @@ class LoginScreenState extends State<LoginScreen> {
               onPressed: () {
                 context.go('/register');
               },
-              child: Text(localizations.newUser),
+              child: Text(localizations.newUser,
+                  style: const TextStyle(color: Colors.white)),
             ),
           ],
         ),

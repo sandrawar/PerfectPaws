@@ -14,7 +14,8 @@ class RegisterScreen extends StatefulWidget {
 class RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _codeController = TextEditingController(); // Controller for verification code
+  final _codeController =
+      TextEditingController(); // Controller for verification code
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   String? _errorMessage;
@@ -22,7 +23,7 @@ class RegisterScreenState extends State<RegisterScreen> {
   bool _isCodeVisible = false; // To show/hide code input field
 
   // Code to verify (for now it's hardcoded as 123)
-  final String _verificationCode = "123"; 
+  final String _verificationCode = "123";
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
@@ -107,8 +108,13 @@ class RegisterScreenState extends State<RegisterScreen> {
     final localizations = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(localizations!.registerYourself),
+        backgroundColor: const Color.fromRGBO(197, 174, 174, 1),
+        title: Text(
+          localizations!.registerYourself,
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
+      backgroundColor: const Color.fromRGBO(188, 104, 104, 1),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -121,6 +127,9 @@ class RegisterScreenState extends State<RegisterScreen> {
                 decoration: InputDecoration(
                   labelText: localizations.email,
                   border: const OutlineInputBorder(),
+                  labelStyle: const TextStyle(color: Colors.white),
+                  hintStyle:
+                      TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                 ),
                 keyboardType: TextInputType.emailAddress,
               ),
@@ -130,19 +139,26 @@ class RegisterScreenState extends State<RegisterScreen> {
                 decoration: InputDecoration(
                   labelText: localizations.password,
                   border: const OutlineInputBorder(),
+                  labelStyle: const TextStyle(color: Colors.white),
+                  hintStyle:
+                      TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                 ),
                 obscureText: true,
               ),
               const SizedBox(height: 16),
               Row(
                 children: [
-                  const Text('Czy jesteś wolontariuszem?'),
+                  const Text(
+                    'Czy jesteś wolontariuszem?',
+                    style: TextStyle(color: Colors.white),
+                  ),
                   Checkbox(
                     value: _isVolunteer,
                     onChanged: (value) {
                       setState(() {
                         _isVolunteer = value ?? false;
-                        _isCodeVisible = _isVolunteer; // Show code input if volunteer
+                        _isCodeVisible =
+                            _isVolunteer; // Show code input if volunteer
                       });
                     },
                   ),
@@ -156,6 +172,9 @@ class RegisterScreenState extends State<RegisterScreen> {
                   decoration: InputDecoration(
                     labelText: 'Wpisz kod weryfikacyjny',
                     border: const OutlineInputBorder(),
+                    labelStyle: const TextStyle(color: Colors.white),
+                    hintStyle:
+                        TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                   ),
                   keyboardType: TextInputType.number,
                 ),
@@ -165,7 +184,9 @@ class RegisterScreenState extends State<RegisterScreen> {
               else
                 ElevatedButton(
                   onPressed: _register,
-                  child: Text(localizations.registerYourself),
+                  child: Text(
+                    localizations.registerYourself,
+                  ),
                 ),
               if (_errorMessage != null)
                 Padding(
@@ -179,7 +200,10 @@ class RegisterScreenState extends State<RegisterScreen> {
                 onPressed: () {
                   context.go('/login');
                 },
-                child: Text(localizations.registeredAlready),
+                child: Text(
+                  localizations.registeredAlready,
+                  style: const TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),
