@@ -65,5 +65,6 @@
     "deleteDog" : "Delete dog's poster",
     "dogDeleted" : "Poster deleted",
     "deleteDogQuestion" : "Do you for sure want to delete this poster?",
-    "deleteDogPermanent" : "This action will be irreversable"
+    "deleteDogPermanent" : "This action will be irreversable",
+    "emptySearch" : "No results found"
   }

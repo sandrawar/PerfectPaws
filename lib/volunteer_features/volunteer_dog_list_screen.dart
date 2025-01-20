@@ -81,7 +81,11 @@ class VolunteerDogsListScreenState extends State<VolunteerDogsListScreen>
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text(localizations.noPosts, style: const TextStyle(color: Colors.white),));
+            return Center(
+                child: Text(
+              localizations.noPosts,
+              style: const TextStyle(color: Colors.white),
+            ));
           }
 
           final dogs = snapshot.data!.docs.map((doc) {

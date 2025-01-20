@@ -65,5 +65,6 @@
     "deleteDog" : "Usuń ogłoszenie",
     "dogDeleted" : "Ogłoszenie zostało usunięte",
     "deleteDogQuestion" : "Czy na pewno chcesz usunąc to ogłoszenie?",
-    "deleteDogPermanent" : "Usunięcie plakatu jest nieodwracalne"
+    "deleteDogPermanent" : "Usunięcie plakatu jest nieodwracalne",
+    "emptySearch" : "Nie znaleziono żadnego psa w tej lokalizacji"
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lottie/lottie.dart';
+import 'package:perfect_paws/dogs_list_logic/dog_search_delegat.dart';
 import 'package:perfect_paws/menu_screen.dart';
 import 'package:perfect_paws/offline_data_sync/networ_status.dart';
 import 'package:perfect_paws/offline_data_sync/sync_act.dart';
@@ -31,6 +32,27 @@ class DogsListScreenState extends State<DogsListScreen>
   bool _isSortedBySaves = false;
   Box<Dog>? _savedDogsBox;
   Box<SyncAction>? _syncActionBox;
+  String _searchQuery = '';
+
+  // Dodaj metodę wyszukiwania
+  Future<List<Dog>> _getDogsFromFirebase(String query) async {
+    final dogsQuery = FirebaseFirestore.instance
+        .collection('dogs')
+        .where('location', isGreaterThanOrEqualTo: query)
+        .where('location', isLessThanOrEqualTo: query + '\uf8ff')
+        .orderBy('numberOfSaves', descending: false);
+
+    final querySnapshot = await dogsQuery.get();
+    final dogs = querySnapshot.docs.map((doc) {
+      return Dog.fromMap(doc.data(), id: doc.id);
+    }).toList();
+
+    for (var dog in dogs) {
+      dog.isSaved = _savedDogsBox?.containsKey(dog.id) ?? false;
+    }
+
+    return dogs;
+  }
 
   Future<void> _openBox() async {
     //Hive.deleteFromDisk();
@@ -91,6 +113,15 @@ class DogsListScreenState extends State<DogsListScreen>
           style: const TextStyle(color: Colors.white),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.search, color: Colors.white),
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: DogSearchDelegate(_searchQuery, _getDogsFromFirebase, _toggleSaved, context),
+              );
+            },
+          ),
           IconButton(
             icon: Icon(
               _showOnlySaved ? Icons.list : Icons.star,
@@ -157,7 +188,7 @@ class DogsListScreenState extends State<DogsListScreen>
 
               if (!_showOnlySaved) {
                 return FutureBuilder<List<Dog>>(
-                  future: _getDogsFromFirebase(),
+                  future: _getDogsFromFirebase(_searchQuery),
                   builder: (context, firebaseSnapshot) {
                     if (firebaseSnapshot.connectionState ==
                         ConnectionState.waiting) {
@@ -211,7 +242,7 @@ class DogsListScreenState extends State<DogsListScreen>
               }
 
               if (dogs.isEmpty) {
-                return Center(child: Text(localizations.emptySavedDogsList));
+                return Center(child: Text(localizations.emptySavedDogsList, style: const TextStyle(color: Colors.white),));
               } else {
                 return CustomScrollView(
                   slivers: [
@@ -278,7 +309,7 @@ class DogsListScreenState extends State<DogsListScreen>
         myChild, myDrawer, maxSlide, toggle, animationController);
   }
 
-  Future<List<Dog>> _getDogsFromFirebase() async {
+  /*Future<List<Dog>> _getDogsFromFirebase() async {
     final dogsQuery = FirebaseFirestore.instance
         .collection('dogs')
         .orderBy('numberOfSaves', descending: !_isSortedBySaves);
@@ -291,7 +322,7 @@ class DogsListScreenState extends State<DogsListScreen>
       dog.isSaved = _savedDogsBox?.containsKey(dog.id) ?? false;
     }
     return dogs;
-  }
+  }*/
 
   Future<bool> _isUserVolunteer() async {
     final userDoc = await FirebaseFirestore.instance
