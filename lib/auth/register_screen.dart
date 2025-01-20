@@ -86,7 +86,7 @@ class RegisterScreenState extends State<RegisterScreen> {
       await messagesSubCollection.add({
         'message': localizations!.welcomeMessage,
         'timestamp': FieldValue.serverTimestamp(),
-        'senderEmail' : "Perfect Paws"
+        'senderEmail': "Perfect Paws"
       });
     } catch (e) {
       if (mounted) {

@@ -1,3 +1,4 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hive/hive.dart';
@@ -106,6 +107,11 @@ class DogDetailsScreenState extends State<DogDetailsScreen> {
 
     if (confirmation == true) {
       try {
+        if (widget.dog.imageUrl.isNotEmpty) {
+          final storageReference =
+              FirebaseStorage.instance.refFromURL(widget.dog.imageUrl);
+          await storageReference.delete();
+        }
         await FirebaseFirestore.instance
             .collection('dogs')
             .doc(widget.dog.id)
@@ -233,7 +239,7 @@ class DogDetailsScreenState extends State<DogDetailsScreen> {
               labelText: localizations.dogsDescription,
               labelStyle: const TextStyle(color: Colors.white),
             ),
-            maxLines: 7,
+            maxLines: 5,
             style: const TextStyle(color: Colors.white),
           ),
           const SizedBox(height: 8),

@@ -100,7 +100,9 @@ class MessageScreenState extends State<MessageScreen> {
           children: [
             TextField(
               controller: _messageController,
-              decoration: InputDecoration(labelText: localizations.yourMessage, hintStyle: const TextStyle(color: Colors.white)),
+              decoration: InputDecoration(
+                  labelText: localizations.yourMessage,
+                  hintStyle: const TextStyle(color: Colors.white)),
               maxLines: 5,
               style: const TextStyle(color: Colors.white),
             ),

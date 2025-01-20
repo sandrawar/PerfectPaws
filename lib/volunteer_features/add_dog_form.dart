@@ -77,6 +77,7 @@ class AddDogFormState extends State<AddDogForm> {
   }
 
   Future<void> _pickImageFromGallery() async {
+    final localizations = AppLocalizations.of(context)!;
     try {
       final XFile? pickedFile =
           await _picker.pickImage(source: ImageSource.gallery);
@@ -89,7 +90,7 @@ class AddDogFormState extends State<AddDogForm> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Error")),
+          SnackBar(content: Text(localizations.error)),
         );
       }
     }
@@ -165,44 +166,38 @@ class AddDogFormState extends State<AddDogForm> {
           key: const ValueKey(0),
           children: [
             TextFormField(
-              controller: _nameController,
-              decoration: InputDecoration(labelText: localizations.dogsName, labelStyle: const TextStyle(color: Colors.white)),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return localizations.dogsNameNullCheck;
-                }
-                return null;
-              },
-            style: const TextStyle(color: Colors.white),
-            ),
+                controller: _nameController,
+                decoration: InputDecoration(labelText: localizations.dogsName),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return localizations.dogsNameNullCheck;
+                  }
+                  return null;
+                }),
             TextFormField(
-              controller: _descriptionController,
-              decoration:
-                  InputDecoration(labelText: localizations.dogsDescription, labelStyle: const TextStyle(color: Colors.white)),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return localizations.dogsDescriptionNullCheck;
-                }
-                return null;
-              },
-            maxLines: 7,
-            style: const TextStyle(color: Colors.white),
-            ),
+                controller: _descriptionController,
+                decoration:
+                    InputDecoration(labelText: localizations.dogsDescription),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return localizations.dogsDescriptionNullCheck;
+                  }
+                  return null;
+                },
+                maxLines: 7),
             TextFormField(
-              controller: _locationController,
-              decoration:
-                  InputDecoration(labelText: localizations.dogsLocation, labelStyle: const TextStyle(color: Colors.white)),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return localizations.dogsLocationNullCheck;
-                }
-                if (!RegExp(r'^[A-Z]').hasMatch(value)) {
-                  return localizations.locationCapitalLetterCheck;
-                }
-                return null;
-              },
-            style: const TextStyle(color: Colors.white),
-            ),
+                controller: _locationController,
+                decoration:
+                    InputDecoration(labelText: localizations.dogsLocation),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return localizations.dogsLocationNullCheck;
+                  }
+                  if (!RegExp(r'^[A-Z]').hasMatch(value)) {
+                    return localizations.locationCapitalLetterCheck;
+                  }
+                  return null;
+                }),
           ],
         );
       case 1:
@@ -247,7 +242,7 @@ class AddDogFormState extends State<AddDogForm> {
         return Column(
           key: const ValueKey(2),
           children: [
-            Text(localizations.dogsBirthDate, style: const TextStyle(color: Colors.white),),
+            Text(localizations.dogsBirthDate),
             TextButton(
               onPressed: _selectBirthDate,
               child: Text(_birthDate != null
