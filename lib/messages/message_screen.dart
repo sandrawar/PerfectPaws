@@ -22,7 +22,7 @@ class MessageScreenState extends State<MessageScreen> {
     _getVolunteerId();
   }
 
-  void _getVolunteerId() async {
+  Future<void> _getVolunteerId() async {
     final localizations = AppLocalizations.of(context)!;
     try {
       final userSnapshot = await FirebaseFirestore.instance
@@ -32,9 +32,11 @@ class MessageScreenState extends State<MessageScreen> {
           .get();
 
       if (userSnapshot.docs.isNotEmpty) {
+        if (mounted){
         setState(() {
           volunteerId = userSnapshot.docs.first.id;
         });
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -45,11 +47,14 @@ class MessageScreenState extends State<MessageScreen> {
   }
 
   void sendMessage(BuildContext context) async {
-    final localizations = AppLocalizations.of(context);
+    final localizations = AppLocalizations.of(context)!;
+    await _getVolunteerId();
     if (volunteerId == null) {
+      if(mounted){
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(localizations!.volunteerIdNull)),
       );
+      }
       return;
     }
 
@@ -102,7 +107,8 @@ class MessageScreenState extends State<MessageScreen> {
               controller: _messageController,
               decoration: InputDecoration(
                   labelText: localizations.yourMessage,
-                  hintStyle: const TextStyle(color: Colors.white)),
+                  hintStyle: const TextStyle(color: Colors.white),
+                  labelStyle: const TextStyle(color: Colors.white)),
               maxLines: 5,
               style: const TextStyle(color: Colors.white),
             ),
