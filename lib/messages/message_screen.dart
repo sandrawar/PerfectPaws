@@ -32,10 +32,10 @@ class MessageScreenState extends State<MessageScreen> {
           .get();
 
       if (userSnapshot.docs.isNotEmpty) {
-        if (mounted){
-        setState(() {
-          volunteerId = userSnapshot.docs.first.id;
-        });
+        if (mounted) {
+          setState(() {
+            volunteerId = userSnapshot.docs.first.id;
+          });
         }
       }
     } catch (e) {
@@ -50,10 +50,10 @@ class MessageScreenState extends State<MessageScreen> {
     final localizations = AppLocalizations.of(context)!;
     await _getVolunteerId();
     if (volunteerId == null) {
-      if(mounted){
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(localizations!.volunteerIdNull)),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(localizations.volunteerIdNull)),
+        );
       }
       return;
     }
@@ -71,7 +71,7 @@ class MessageScreenState extends State<MessageScreen> {
       if (mounted) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(localizations!.messageSent)),
+            SnackBar(content: Text(localizations.messageSent)),
           );
           Navigator.of(context).pop();
         });
@@ -80,7 +80,7 @@ class MessageScreenState extends State<MessageScreen> {
       if (mounted) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(localizations!.sendingMessageError)),
+            SnackBar(content: Text(localizations.sendingMessageError)),
           );
         });
       }
