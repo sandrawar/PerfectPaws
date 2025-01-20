@@ -23,6 +23,7 @@ class MessageScreenState extends State<MessageScreen> {
   }
 
   void _getVolunteerId() async {
+    final localizations = AppLocalizations.of(context)!;
     try {
       final userSnapshot = await FirebaseFirestore.instance
           .collection('users')
@@ -38,7 +39,7 @@ class MessageScreenState extends State<MessageScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("Error")));
+            .showSnackBar(SnackBar(content: Text(localizations.error)));
       }
     }
   }
@@ -99,8 +100,9 @@ class MessageScreenState extends State<MessageScreen> {
           children: [
             TextField(
               controller: _messageController,
-              decoration: InputDecoration(labelText: localizations.yourMessage),
+              decoration: InputDecoration(labelText: localizations.yourMessage, hintStyle: const TextStyle(color: Colors.white)),
               maxLines: 5,
+              style: const TextStyle(color: Colors.white),
             ),
             const SizedBox(height: 20),
             ElevatedButton(

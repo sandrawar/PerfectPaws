@@ -166,29 +166,32 @@ class AddDogFormState extends State<AddDogForm> {
           children: [
             TextFormField(
               controller: _nameController,
-              decoration: InputDecoration(labelText: localizations.dogsName),
+              decoration: InputDecoration(labelText: localizations.dogsName, labelStyle: const TextStyle(color: Colors.white)),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return localizations.dogsNameNullCheck;
                 }
                 return null;
               },
+            style: const TextStyle(color: Colors.white),
             ),
             TextFormField(
               controller: _descriptionController,
               decoration:
-                  InputDecoration(labelText: localizations.dogsDescription),
+                  InputDecoration(labelText: localizations.dogsDescription, labelStyle: const TextStyle(color: Colors.white)),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return localizations.dogsDescriptionNullCheck;
                 }
                 return null;
               },
+            maxLines: 7,
+            style: const TextStyle(color: Colors.white),
             ),
             TextFormField(
               controller: _locationController,
               decoration:
-                  InputDecoration(labelText: localizations.dogsLocation),
+                  InputDecoration(labelText: localizations.dogsLocation, labelStyle: const TextStyle(color: Colors.white)),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return localizations.dogsLocationNullCheck;
@@ -198,6 +201,7 @@ class AddDogFormState extends State<AddDogForm> {
                 }
                 return null;
               },
+            style: const TextStyle(color: Colors.white),
             ),
           ],
         );
@@ -243,7 +247,7 @@ class AddDogFormState extends State<AddDogForm> {
         return Column(
           key: const ValueKey(2),
           children: [
-            Text(localizations.dogsBirthDate),
+            Text(localizations.dogsBirthDate, style: const TextStyle(color: Colors.white),),
             TextButton(
               onPressed: _selectBirthDate,
               child: Text(_birthDate != null

@@ -58,7 +58,7 @@ class DogsListScreenState extends State<DogsListScreen>
     final userId = _currentUser.uid;
     _savedDogsBox = await Hive.openBox<Dog>('saved_dogs_$userId');
 
-    // _savedDogsBox?.clear();
+    //_savedDogsBox?.clear();
   }
 
   Future<void> _initializeSyncService() async {

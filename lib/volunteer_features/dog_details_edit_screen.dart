@@ -233,7 +233,7 @@ class DogDetailsScreenState extends State<DogDetailsScreen> {
               labelText: localizations.dogsDescription,
               labelStyle: const TextStyle(color: Colors.white),
             ),
-            maxLines: 3,
+            maxLines: 7,
             style: const TextStyle(color: Colors.white),
           ),
           const SizedBox(height: 8),
