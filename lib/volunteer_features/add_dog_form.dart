@@ -193,6 +193,9 @@ class AddDogFormState extends State<AddDogForm> {
                 if (value == null || value.isEmpty) {
                   return localizations.dogsLocationNullCheck;
                 }
+                if (!RegExp(r'^[A-Z]').hasMatch(value)) {
+                  return localizations.locationCapitalLetterCheck;
+                }
                 return null;
               },
             ),

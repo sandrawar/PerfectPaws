@@ -8,7 +8,7 @@
     "dogsName" : "Imię psa",
     "dogsDescription" : "Opis psa",
     "dogsAge" : "Wiek psa",
-    "dogsLocation": "Lokalizacja psa",
+    "dogsLocation": "Lokalizacja psa (zacznij od miasta)",
     "next" : "Dalej",
     "prev" : "Wróć",
     "add" : "Dodaj",
@@ -66,5 +66,6 @@
     "dogDeleted" : "Ogłoszenie zostało usunięte",
     "deleteDogQuestion" : "Czy na pewno chcesz usunąc to ogłoszenie?",
     "deleteDogPermanent" : "Usunięcie plakatu jest nieodwracalne",
-    "emptySearch" : "Nie znaleziono żadnego psa w tej lokalizacji"
+    "emptySearch" : "Nie znaleziono żadnego psa w tej lokalizacji",
+     "locationCapitalLetterCheck": "Lokalizacja musi zaczynać się miastem pisanym wileką literą"
 }

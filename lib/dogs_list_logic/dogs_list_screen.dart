@@ -32,14 +32,13 @@ class DogsListScreenState extends State<DogsListScreen>
   bool _isSortedBySaves = false;
   Box<Dog>? _savedDogsBox;
   Box<SyncAction>? _syncActionBox;
-  String _searchQuery = '';
+  final String _searchQuery = '';
 
-  // Dodaj metodę wyszukiwania
   Future<List<Dog>> _getDogsFromFirebase(String query) async {
     final dogsQuery = FirebaseFirestore.instance
         .collection('dogs')
         .where('location', isGreaterThanOrEqualTo: query)
-        .where('location', isLessThanOrEqualTo: query + '\uf8ff')
+        .where('location', isLessThanOrEqualTo: '$query\uf8ff')
         .orderBy('numberOfSaves', descending: false);
 
     final querySnapshot = await dogsQuery.get();
@@ -118,7 +117,8 @@ class DogsListScreenState extends State<DogsListScreen>
             onPressed: () {
               showSearch(
                 context: context,
-                delegate: DogSearchDelegate(_searchQuery, _getDogsFromFirebase, _toggleSaved, context),
+                delegate: DogSearchDelegate(
+                    _searchQuery, _getDogsFromFirebase, _toggleSaved, context),
               );
             },
           ),
@@ -242,7 +242,11 @@ class DogsListScreenState extends State<DogsListScreen>
               }
 
               if (dogs.isEmpty) {
-                return Center(child: Text(localizations.emptySavedDogsList, style: const TextStyle(color: Colors.white),));
+                return Center(
+                    child: Text(
+                  localizations.emptySavedDogsList,
+                  style: const TextStyle(color: Colors.white),
+                ));
               } else {
                 return CustomScrollView(
                   slivers: [

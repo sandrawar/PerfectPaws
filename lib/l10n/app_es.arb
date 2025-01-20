@@ -66,5 +66,6 @@
     "dogDeleted": "Cartel eliminado",
     "deleteDogQuestion": "¿Está seguro de que desea eliminar este cartel?",
     "deleteDogPermanent": "Esta acción será irreversible",
-    "emptySearch" : ""
+    "emptySearch" : "",
+     "locationCapitalLetterCheck": "Location must start with a capital letter."
 }
