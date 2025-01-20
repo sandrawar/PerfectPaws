@@ -61,5 +61,6 @@
     "estimatedDate" : "Data urodzenia psa jest jedynie przybliżeniem",
     "deleteFromSaved" : "Usuń psa z zapisanych",
     "saveDog" : "Dodaj psa do zapamiętanych",
-    "logOut" : "Wyloguj"
+    "logOut" : "Wyloguj",
+    "deleteDog" : "Usuń ogłoszenie"
 }

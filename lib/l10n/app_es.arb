@@ -60,5 +60,6 @@
     "estimatedDate" : "",
     "deleteFromSaved" : "",
     "saveDog" : "",
-    "logOut" : ""
+    "logOut" : "",
+    "deleteDog" : ""
 }

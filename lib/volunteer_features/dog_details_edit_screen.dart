@@ -27,8 +27,7 @@ class DogDetailsScreenState extends State<DogDetailsScreen> {
     _descriptionController =
         TextEditingController(text: widget.dog.description);
     _locationController = TextEditingController(text: widget.dog.location);
-    _selectedBirthDate =
-        widget.dog.birthDate.toDate(); 
+    _selectedBirthDate = widget.dog.birthDate.toDate();
   }
 
   @override
@@ -49,7 +48,7 @@ class DogDetailsScreenState extends State<DogDetailsScreen> {
 
     if (pickedDate != null && pickedDate != _selectedBirthDate) {
       setState(() {
-        _selectedBirthDate = pickedDate; 
+        _selectedBirthDate = pickedDate;
       });
     }
   }
@@ -59,7 +58,7 @@ class DogDetailsScreenState extends State<DogDetailsScreen> {
 
     final updatedDog = widget.dog.copyWith(
       name: _nameController.text,
-      birthDate: Timestamp.fromDate(_selectedBirthDate), 
+      birthDate: Timestamp.fromDate(_selectedBirthDate),
       description: _descriptionController.text,
       location: _locationController.text,
     );
@@ -80,6 +79,59 @@ class DogDetailsScreenState extends State<DogDetailsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(localizations!.dogsDataUpdateError)),
         );
+      }
+    }
+  }
+
+  Future<void> _deleteDog() async {
+    final localizations = AppLocalizations.of(context);
+    final confirmation = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(localizations!.deleteDog),
+        content: Text(localizations.deleteDog),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(localizations.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(localizations.deleteDog),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmation == true) {
+      try {
+        await FirebaseFirestore.instance
+            .collection('dogs')
+            .doc(widget.dog.id)
+            .delete();
+
+        final savedDogsSnapshots = await FirebaseFirestore.instance
+            .collectionGroup('saved_dogs')
+            .where('id', isEqualTo: widget.dog.id)
+            .get();
+
+        for (var doc in savedDogsSnapshots.docs) {
+          await doc.reference.delete();
+        }
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(localizations!.deleteDog)),
+          );
+          context.go('/volunteer-dogs');
+        }
+      } catch (e) {
+        if (mounted) {
+          print(e);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(localizations!.error)),
+          );
+        }
       }
     }
   }
@@ -111,19 +163,17 @@ class DogDetailsScreenState extends State<DogDetailsScreen> {
             decoration: InputDecoration(
               labelText: localizations!.dogsName,
               labelStyle: const TextStyle(color: Colors.white),
-              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+              hintStyle: TextStyle(color: Colors.white.withAlpha(150)),
             ),
             style: const TextStyle(color: Colors.white),
           ),
           const SizedBox(height: 8),
           GestureDetector(
-            onTap: () =>
-                _selectBirthDate(context), 
+            onTap: () => _selectBirthDate(context),
             child: AbsorbPointer(
               child: TextField(
                 controller: TextEditingController(
-                    text: '${_selectedBirthDate.toLocal()}'
-                        .split(' ')[0]), 
+                    text: '${_selectedBirthDate.toLocal()}'.split(' ')[0]),
                 decoration: InputDecoration(
                   labelText: localizations.dogsAge,
                   labelStyle: const TextStyle(color: Colors.white),
@@ -155,6 +205,14 @@ class DogDetailsScreenState extends State<DogDetailsScreen> {
           ElevatedButton(
             onPressed: _updateDogData,
             child: Text(localizations.saveChanges),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _deleteDog,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            child: Text(localizations.deleteDog),
           ),
         ],
         onNext: _updateDogData,

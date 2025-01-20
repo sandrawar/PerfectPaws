@@ -61,5 +61,6 @@
     "estimatedDate" : "This birth date is just an estimation",
     "deleteFromSaved" : "Delete dog from saved",
     "saveDog" : "Add dog to remembered",
-    "logOut" : "Log out"
+    "logOut" : "Log out",
+    "deleteDog" : "Delete dog's poster"
   }
