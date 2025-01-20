@@ -67,5 +67,6 @@
     "deleteDogQuestion": "¿Está seguro de que desea eliminar este cartel?",
     "deleteDogPermanent": "Esta acción será irreversible",
     "emptySearch" : "No se encontraron resultados",
-     "locationCapitalLetterCheck": "La ubicación debe comenzar con una letra mayúscula."
+     "locationCapitalLetterCheck": "La ubicación debe comenzar con una letra mayúscula.",
+     "locationCapitalLetterNameCheck": "El nombre debe comenzar con una letra mayúscula."
 }

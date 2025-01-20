@@ -67,5 +67,6 @@
     "deleteDogQuestion" : "Czy na pewno chcesz usunąc to ogłoszenie?",
     "deleteDogPermanent" : "Usunięcie plakatu jest nieodwracalne",
     "emptySearch" : "Nie znaleziono żadnego psa w tej lokalizacji",
-     "locationCapitalLetterCheck": "Lokalizacja musi zaczynać się miastem pisanym wileką literą"
+     "locationCapitalLetterCheck": "Lokalizacja musi zaczynać się miastem pisanym wileką literą",
+     "locationCapitalLetterNameCheck": "Imię musi zaczynać się miastem pisanym wileką literą"
 }

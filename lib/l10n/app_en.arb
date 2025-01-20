@@ -67,5 +67,6 @@
     "deleteDogQuestion" : "Do you for sure want to delete this poster?",
     "deleteDogPermanent" : "This action will be irreversable",
     "emptySearch" : "No results found",
-     "locationCapitalLetterCheck": "Location must start with a capital letter."
+    "locationCapitalLetterCheck": "Location must start with a capital letter.",
+    "locationCapitalLetterNameCheck": "Name must start with a capital letter."
   }

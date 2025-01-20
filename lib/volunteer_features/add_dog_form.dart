@@ -57,6 +57,7 @@ class AddDogFormState extends State<AddDogForm> {
   }
 
   Future<void> _takePicture() async {
+    final localizations = AppLocalizations.of(context)!;
     if (!_controller!.value.isInitialized) {
       return;
     }
@@ -70,7 +71,7 @@ class AddDogFormState extends State<AddDogForm> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Error")),
+          SnackBar(content: Text(localizations.error)),
         );
       }
     }
@@ -171,6 +172,9 @@ class AddDogFormState extends State<AddDogForm> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return localizations.dogsNameNullCheck;
+                  }
+                  if (!RegExp(r'^[A-Z]').hasMatch(value)) {
+                    return localizations.locationCapitalLetterNameCheck;
                   }
                   return null;
                 }),
