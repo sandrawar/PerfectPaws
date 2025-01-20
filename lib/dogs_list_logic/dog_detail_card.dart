@@ -62,10 +62,12 @@ abstract class DogDetailsCard {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
-                  onFavoriteToggle(dog); 
-                  Navigator.of(context).pop(); 
+                  onFavoriteToggle(dog);
+                  Navigator.of(context).pop();
                 },
-                child: Text(dog.isSaved ? localizations.deleteFromSaved : localizations.saveDog),
+                child: Text(dog.isSaved
+                    ? localizations.deleteFromSaved
+                    : localizations.saveDog),
               ),
             ],
             onNext: () {

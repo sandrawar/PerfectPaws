@@ -62,5 +62,8 @@
     "deleteFromSaved" : "Delete dog from saved",
     "saveDog" : "Add dog to remembered",
     "logOut" : "Log out",
-    "deleteDog" : "Delete dog's poster"
+    "deleteDog" : "Delete dog's poster",
+    "dogDeleted" : "Poster deleted",
+    "deleteDogQuestion" : "Do you for sure want to delete this poster?",
+    "deleteDogPermanent" : "This action will be irreversable"
   }

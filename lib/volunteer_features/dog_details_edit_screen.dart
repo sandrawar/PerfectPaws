@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hive/hive.dart';
 import 'package:perfect_paws/dogs_list_logic/dog_class.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -88,8 +89,8 @@ class DogDetailsScreenState extends State<DogDetailsScreen> {
     final confirmation = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(localizations!.deleteDog),
-        content: Text(localizations.deleteDog),
+        title: Text(localizations!.deleteDogQuestion),
+        content: Text(localizations.deleteDogPermanent),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -110,30 +111,73 @@ class DogDetailsScreenState extends State<DogDetailsScreen> {
             .doc(widget.dog.id)
             .delete();
 
-        final savedDogsSnapshots = await FirebaseFirestore.instance
-            .collectionGroup('saved_dogs')
-            .where('id', isEqualTo: widget.dog.id)
-            .get();
+        await _deleteFromSavedDogs();
 
-        for (var doc in savedDogsSnapshots.docs) {
-          await doc.reference.delete();
-        }
+        await _deleteDogFromHive();
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(localizations!.deleteDog)),
+            SnackBar(content: Text(localizations!.dogDeleted)),
           );
           context.go('/volunteer-dogs');
         }
       } catch (e) {
         if (mounted) {
-          print(e);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(localizations!.error)),
           );
         }
       }
     }
+  }
+
+  Future<void> _deleteFromSavedDogs() async {
+    final localizations = AppLocalizations.of(context)!;
+    final usersIds = await _getAllUserIds();
+    for (var userId in usersIds) {
+      final savedDogsSnapshots = await FirebaseFirestore.instance
+          .collectionGroup('saved_dogs')
+          .where(FieldPath.documentId,
+              isEqualTo: 'users/$userId/saved_dogs/${widget.dog.id}')
+          .get();
+
+      for (var doc in savedDogsSnapshots.docs) {
+        try {
+          await doc.reference.delete();
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(localizations.error)));
+          }
+        }
+      }
+    }
+  }
+
+  Future<void> _deleteDogFromHive() async {
+    final localizations = AppLocalizations.of(context)!;
+    try {
+      final userIds = await _getAllUserIds();
+
+      for (var userId in userIds) {
+        final box = await Hive.openBox<Dog>('saved_dogs_$userId');
+
+        if (box.containsKey(widget.dog.id)) {
+          await box.delete(widget.dog.id);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(localizations.error)));
+      }
+    }
+  }
+
+  Future<List<String>> _getAllUserIds() async {
+    final querySnapshot =
+        await FirebaseFirestore.instance.collection('users').get();
+    return querySnapshot.docs.map((doc) => doc.id).toList();
   }
 
   @override

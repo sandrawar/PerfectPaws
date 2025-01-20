@@ -60,16 +60,15 @@ class LoginScreenState extends State<LoginScreen> {
               style: const TextStyle(color: Colors.white),
             ),
             TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: localizations.password,
-                labelStyle: const TextStyle(color: Colors.white),
-                hintStyle:
-                    TextStyle(color: Colors.white.withValues(alpha: 0.7)),
-              ),
-              style: const TextStyle(color: Colors.white)
-            ),
+                controller: _passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: localizations.password,
+                  labelStyle: const TextStyle(color: Colors.white),
+                  hintStyle:
+                      TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                ),
+                style: const TextStyle(color: Colors.white)),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _login,

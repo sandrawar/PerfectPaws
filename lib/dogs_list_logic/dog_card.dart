@@ -22,8 +22,8 @@ class DogCard extends StatelessWidget {
         leading: ClipOval(
             child: Image.network(
           dog.imageUrl,
-          width: 50.0, 
-          height: 50.0, 
+          width: 50.0,
+          height: 50.0,
           fit: BoxFit.cover,
         )),
         title: Text(

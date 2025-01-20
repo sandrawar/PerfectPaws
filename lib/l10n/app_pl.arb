@@ -62,5 +62,8 @@
     "deleteFromSaved" : "Usuń psa z zapisanych",
     "saveDog" : "Dodaj psa do zapamiętanych",
     "logOut" : "Wyloguj",
-    "deleteDog" : "Usuń ogłoszenie"
+    "deleteDog" : "Usuń ogłoszenie",
+    "dogDeleted" : "Ogłoszenie zostało usunięte",
+    "deleteDogQuestion" : "Czy na pewno chcesz usunąc to ogłoszenie?",
+    "deleteDogPermanent" : "Usunięcie plakatu jest nieodwracalne"
 }

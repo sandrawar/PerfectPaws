@@ -61,5 +61,8 @@
     "deleteFromSaved" : "",
     "saveDog" : "",
     "logOut" : "",
-    "deleteDog" : ""
+    "deleteDog" : "",
+    "dogDeleted" : "",
+    "deleteDogQuestion" : "",
+    "deleteDogPermanent" : ""
 }

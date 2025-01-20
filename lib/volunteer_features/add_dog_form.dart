@@ -96,7 +96,6 @@ class AddDogFormState extends State<AddDogForm> {
   }
 
   Future<String> _uploadImageToFirebase(XFile image) async {
-    
     final localizations = AppLocalizations.of(context)!;
     try {
       final file = File(image.path);

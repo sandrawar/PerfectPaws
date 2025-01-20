@@ -35,9 +35,9 @@ class DogsListScreenState extends State<DogsListScreen>
   Future<void> _openBox() async {
     //Hive.deleteFromDisk();
     final userId = _currentUser.uid;
-  _savedDogsBox = await Hive.openBox<Dog>('saved_dogs_$userId');
-    
-   // _savedDogsBox?.clear();
+    _savedDogsBox = await Hive.openBox<Dog>('saved_dogs_$userId');
+
+    // _savedDogsBox?.clear();
   }
 
   Future<void> _initializeSyncService() async {
@@ -146,7 +146,8 @@ class DogsListScreenState extends State<DogsListScreen>
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('${localizations.error}: ${snapshot.error}'));
+            return Center(
+                child: Text('${localizations.error}: ${snapshot.error}'));
           }
 
           return ValueListenableBuilder(
@@ -302,71 +303,63 @@ class DogsListScreenState extends State<DogsListScreen>
   }
 
   Future<void> _toggleSaved(Dog dog) async {
-  final localizations = AppLocalizations.of(context)!;
-  if (dog.id.isEmpty) {
-    return;
-  }
+    final localizations = AppLocalizations.of(context)!;
+    if (dog.id.isEmpty) {
+      return;
+    }
 
-  final savedDogRef = _savedDogsCollection.doc(dog.id);
-  
+    final savedDogRef = _savedDogsCollection.doc(dog.id);
+
     final dogRef = FirebaseFirestore.instance.collection('dogs').doc(dog.id);
-  try {
-    final userId = _currentUser.uid;
-    final isAlreadySavedLocal = _savedDogsBox?.containsKey(dog.id) ?? false;
+    try {
+      final isAlreadySavedLocal = _savedDogsBox?.containsKey(dog.id) ?? false;
 
-    if (isAlreadySavedLocal) {
-      await dogRef.update({
-        'isSaved': true,
-        'numberOfSaves': FieldValue.increment(-1),
-      });
-      await _savedDogsBox?.delete(dog.id);
-    } else {
-      await dogRef.update({
-        'isSaved': true,
-        'numberOfSaves': FieldValue.increment(1),
-      });
-      await _savedDogsBox?.put(dog.id, dog);
-      if (mounted) {
-        _showSaveAnimation(context);
-      }
-    }
-
-    NetworkStatusService networkStatusService = NetworkStatusService();
-    if (await networkStatusService.isOnline) {
-      final isAlreadySaved = await savedDogRef.get().then((doc) => doc.exists);
-      
-
-      if (isAlreadySaved) {
-        await savedDogRef.delete();
+      if (isAlreadySavedLocal) {
+        await dogRef.update({
+          'isSaved': true,
+          'numberOfSaves': FieldValue.increment(-1),
+        });
+        await _savedDogsBox?.delete(dog.id);
       } else {
-        await savedDogRef.set(dog.toMap());
+        await dogRef.update({
+          'isSaved': true,
+          'numberOfSaves': FieldValue.increment(1),
+        });
+        await _savedDogsBox?.put(dog.id, dog);
+        if (mounted) {
+          _showSaveAnimation(context);
+        }
       }
-    } else {
-      final syncAction = SyncAction(
-        actionType: isAlreadySavedLocal ? 'delete' : 'save',
-        dogId: dog.id,
-        timestamp: DateTime.now(),
-      );
+
+      NetworkStatusService networkStatusService = NetworkStatusService();
+      if (await networkStatusService.isOnline) {
+        final isAlreadySaved =
+            await savedDogRef.get().then((doc) => doc.exists);
+
+        if (isAlreadySaved) {
+          await savedDogRef.delete();
+        } else {
+          await savedDogRef.set(dog.toMap());
+        }
+      } else {
+        final syncAction = SyncAction(
+          actionType: isAlreadySavedLocal ? 'delete' : 'save',
+          dogId: dog.id,
+          timestamp: DateTime.now(),
+        );
+        await Hive.box<SyncAction>('sync_actions').add(syncAction);
+      }
+    } catch (e) {
       if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Action completes")));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("${localizations.error}: $e")));
+      }
     }
-      await Hive.box<SyncAction>('sync_actions').add(syncAction);
-    }
-  } catch (e) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("${localizations.error}: $e")));
-    }
+
+    setState(() {
+      dog.isSaved = !dog.isSaved;
+    });
   }
-
-  setState(() {
-    dog.isSaved = !dog.isSaved;
-  });
-}
-
-
-
 
   void _showSaveAnimation(BuildContext context) {
     showDialog(

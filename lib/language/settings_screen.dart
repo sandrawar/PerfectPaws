@@ -45,7 +45,8 @@ class SettingsScreenState extends State<SettingsScreen>
             toggle();
           },
         ),
-        title: Text(AppLocalizations.of(context)?.settings ?? 'Settings', style: const TextStyle(color: Colors.white)),
+        title: Text(AppLocalizations.of(context)?.settings ?? 'Settings',
+            style: const TextStyle(color: Colors.white)),
       ),
       backgroundColor: const Color.fromRGBO(188, 104, 104, 1),
       body: ListView(

@@ -106,7 +106,8 @@ final GoRouter _router = GoRouter(
   errorPageBuilder: (context, state) => MaterialPage(
     child: Scaffold(
       body: Center(
-        child: Text('${AppLocalizations.of(context)!.errorMessage}; ${state.error}'),
+        child: Text(
+            '${AppLocalizations.of(context)!.errorMessage}; ${state.error}'),
       ),
     ),
   ),
@@ -155,7 +156,7 @@ final GoRouter _router = GoRouter(
       path: '/dog-details/:id',
       name: 'dogDetails',
       builder: (context, state) {
-    final localizations = AppLocalizations.of(context)!;
+        final localizations = AppLocalizations.of(context)!;
         final dogData = state.extra as Dog?;
         if (dogData == null) {
           return Scaffold(
